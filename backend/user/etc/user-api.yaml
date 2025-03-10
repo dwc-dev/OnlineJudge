@@ -1,0 +1,6 @@
+Name: user-api
+Host: 0.0.0.0
+Port: 8001
+MysqlConfig:
+  Datasource: "user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+  ConnectTimeout: 5
