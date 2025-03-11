@@ -2,7 +2,10 @@ module user
 
 go 1.24.1
 
-require github.com/zeromicro/go-zero v1.8.1
+require (
+	github.com/zeromicro/go-zero v1.8.1
+	golang.org/x/crypto v0.36.0
+)
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -39,7 +42,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
