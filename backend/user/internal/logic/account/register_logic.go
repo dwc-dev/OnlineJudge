@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"user/internal/db/model/account"
+	"user/internal/response"
 	"user/internal/svc"
 	"user/internal/types"
 
@@ -28,18 +29,15 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 func (l *RegisterLogic) Register(req *types.RegisterReq) (resp *types.RegisterResp, err error) {
 	err = l.svcCtx.UsersModel.CheckUserName(l.ctx, req.Username)
 	if err != nil {
-		l.Logger.Error(err)
-		return
+		return nil, err
 	}
 	err = l.svcCtx.UsersModel.CheckUserEmail(l.ctx, req.Email)
 	if err != nil {
-		l.Logger.Error(err)
-		return
+		return nil, err
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		l.Logger.Error(err)
-		return
+		return nil, response.ServerError
 	}
 	err = l.svcCtx.UsersModel.CreateNewUser(l.ctx, &account.Users{
 		UserName:     req.Username,
@@ -48,8 +46,7 @@ func (l *RegisterLogic) Register(req *types.RegisterReq) (resp *types.RegisterRe
 		UserRole:     "user",
 	})
 	if err != nil {
-		l.Logger.Error(err)
-		return
+		return nil, err
 	}
-	return
+	return nil, nil
 }

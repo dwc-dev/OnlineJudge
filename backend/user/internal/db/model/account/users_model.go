@@ -2,9 +2,9 @@ package account
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
+	"user/internal/response"
 
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
@@ -40,10 +40,10 @@ func (m *customUsersModel) CheckUserName(ctx context.Context, userName string) e
 	query := fmt.Sprintf("select count(*) from %s where `user_name` = ?", m.table)
 	err := m.conn.QueryRowCtx(ctx, &count, query, userName)
 	if err != nil {
-		return err
+		return response.DBError
 	}
 	if count > 0 {
-		return errors.New("username already exists")
+		return response.UserNameAlreadyRegister
 	}
 	return nil
 }
@@ -53,10 +53,10 @@ func (m *customUsersModel) CheckUserEmail(ctx context.Context, userEmail string)
 	query := fmt.Sprintf("select count(*) from %s where `user_email` = ?", m.table)
 	err := m.conn.QueryRowCtx(ctx, &count, query, userEmail)
 	if err != nil {
-		return err
+		return response.DBError
 	}
 	if count > 0 {
-		return errors.New("email already exists")
+		return response.EmailAlreadyRegister
 	}
 	return nil
 }
@@ -67,5 +67,8 @@ func (m *customUsersModel) CreateNewUser(ctx context.Context, data *Users) error
 	valuePlaceholders := strings.Repeat("?,", len(colsSlice)-1) + "?"
 	query := fmt.Sprintf("insert into %s (%s) values (%s)", m.table, insertCols, valuePlaceholders)
 	_, err := m.conn.ExecCtx(ctx, query, data.UserName, data.UserEmail, data.UserPassword, data.UserRole)
-	return err
+	if err != nil {
+		return response.DBError
+	}
+	return nil
 }
