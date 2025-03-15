@@ -11,6 +11,8 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 import tailwindcss from '@tailwindcss/vite'
 
+import ElementPlus from 'unplugin-element-plus/vite'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -24,10 +26,11 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
     tailwindcss(),
+    ElementPlus({}),
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 })
