@@ -10,5 +10,8 @@
     {
       "path": "./tsconfig.vitest.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "strict": true // 启用严格类型检查
+  }
 }

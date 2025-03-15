@@ -66,6 +66,8 @@
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Message, Lock, User } from '@element-plus/icons-vue'
+import auth from '@/api/modules/auth'
+import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -95,7 +97,12 @@ const registerForm = ref({
 
 const handleLogin = () => {}
 
-const handleRegister = () => {}
+const handleRegister = async () => {
+  // 错误提示已在基础请求方法和拦截器中完成，此处无需额外处理
+  await auth.register(registerForm.value)
+  ElMessage.success('注册成功！')
+  router.push(`/auth/login`)
+}
 </script>
 
 <style scoped></style>
