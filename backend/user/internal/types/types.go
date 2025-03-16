@@ -9,7 +9,9 @@ type LoginReq struct {
 }
 
 type LoginResp struct {
-	Token string `json:"token"`
+	Token    string `json:"token"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
 type RegisterReq struct {

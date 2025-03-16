@@ -21,8 +21,9 @@ func (e *RespError) Error() string {
 }
 
 var (
-	EmailAlreadyRegister    = NewRespError(40001, "邮箱已被注册", http.StatusBadRequest)
-	UserNameAlreadyRegister = NewRespError(40002, "用户名已被注册", http.StatusBadRequest)
+	InvalidParams           = NewRespError(40001, "参数错误", http.StatusBadRequest)
+	EmailAlreadyRegister    = NewRespError(40901, "邮箱已被注册", http.StatusConflict)
+	UserNameAlreadyRegister = NewRespError(40902, "用户名已被注册", http.StatusConflict)
 	ServerError             = NewRespError(50001, "服务器错误", http.StatusInternalServerError)
 	DBError                 = NewRespError(50002, "数据库错误", http.StatusInternalServerError)
 )

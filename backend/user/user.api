@@ -14,11 +14,12 @@ type LoginReq {
 }
 
 type LoginResp {
-	Token string `json:"token"`
+	Token    string `json:"token"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
 }
 
 @server (
-	group:  account
 	prefix: api/v1
 )
 service user-api {
