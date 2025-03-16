@@ -2,11 +2,13 @@ package account
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"user/internal/response"
 
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var _ UsersModel = (*customUsersModel)(nil)
@@ -17,6 +19,7 @@ type (
 		CheckUserName(ctx context.Context, userName string) error
 		CheckUserEmail(ctx context.Context, userEmail string) error
 		CreateNewUser(ctx context.Context, data *Users) error
+		CompareUserPassword(ctx context.Context, userEmail string, password string) (uint64, error)
 		withSession(session sqlx.Session) UsersModel
 	}
 
@@ -71,4 +74,31 @@ func (m *customUsersModel) CreateNewUser(ctx context.Context, data *Users) error
 		return response.DBError
 	}
 	return nil
+}
+
+func (m *customUsersModel) CompareUserPassword(ctx context.Context, userEmail string, password string) (uint64, error) {
+	type userInfo struct {
+		Id  uint64 `db:"id"`            // 用户ID
+		Psw string `db:"user_password"` // 密码
+	}
+	var info userInfo
+	query := fmt.Sprintf("select id,user_password from %s where `user_email` = ?", m.table)
+	err := m.conn.QueryRowCtx(ctx, &info, query, userEmail)
+	if err != nil {
+		if errors.Is(err, sqlx.ErrNotFound) {
+			return 0, response.UserNoFound
+		} else {
+			return 0, response.DBError
+		}
+	}
+
+	// 第一个参数必须是哈希密码（从数据库中读取的）
+	// 第二个参数必须是用户输入的明文密码
+	err = bcrypt.CompareHashAndPassword([]byte(info.Psw), []byte(password))
+
+	if err != nil {
+		// 密码不匹配
+		return 0, response.InvalidPassword
+	}
+	return info.Id, nil
 }

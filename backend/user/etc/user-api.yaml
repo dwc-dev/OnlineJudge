@@ -6,3 +6,6 @@ MysqlConfig:
   ConnectTimeout: 5
 CORSOrigins:
   - "http://localhost:5173"
+JWT:
+  Secret: ""
+  Expire: 3600

@@ -9,14 +9,12 @@ type RegisterReq {
 type RegisterResp {}
 
 type LoginReq {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type LoginResp {
-	Token    string `json:"token"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Token string `json:"token"`
 }
 
 @server (

@@ -4,14 +4,12 @@
 package types
 
 type LoginReq struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type LoginResp struct {
-	Token    string `json:"token"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Token string `json:"token"`
 }
 
 type RegisterReq struct {

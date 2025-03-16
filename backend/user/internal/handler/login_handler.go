@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"user/internal/logic"
+	"user/internal/response"
 	"user/internal/svc"
 	"user/internal/types"
 
@@ -14,16 +15,12 @@ func loginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.LoginReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
+			response.Response(r.Context(), w, nil, response.InvalidParams)
 			return
 		}
 
 		l := logic.NewLoginLogic(r.Context(), svcCtx)
 		resp, err := l.Login(&req)
-		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
-		}
+		response.Response(r.Context(), w, resp, err)
 	}
 }
