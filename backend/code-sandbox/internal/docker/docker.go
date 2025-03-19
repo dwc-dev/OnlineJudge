@@ -30,25 +30,18 @@ func InitClient() error {
 func CreateContainer(image string) (string, error) {
 	ctx := context.Background()
 	config := &container.Config{
-		Image: image,
-		Tty:   true,
+		Image:           image,
+		Tty:             true,
+		NetworkDisabled: true,
 	}
 	hostConfig := &container.HostConfig{
 		AutoRemove: true,
-		// Mounts: []mount.Mount{
-		// 	{
-		// 		Type:   mount.TypeVolume,
-		// 		Source: "sandbox_volume",
-		// 		Target: "/sandbox",
-		// 	},
-		// },
 		Resources: container.Resources{
 			Memory:     512 * 1024 * 1024, // 512MB
 			MemorySwap: 512 * 1024 * 1024, // 512MB (内存 + 交换分区)
 			CPUCount:   1,                 // 1 个 CPU
 		},
 	}
-
 	resp, err := cli.ContainerCreate(ctx, config, hostConfig, nil, nil, "")
 	if err != nil {
 		return "", err
