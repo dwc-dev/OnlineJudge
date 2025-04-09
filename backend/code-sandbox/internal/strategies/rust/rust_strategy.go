@@ -1,8 +1,8 @@
 package rust
 
 import (
-	"code-sandbox/internal/docker"
-	"code-sandbox/internal/types"
+	"backend/code-sandbox/docker"
+	"backend/code-sandbox/internal/types"
 	"context"
 	"fmt"
 	"strconv"

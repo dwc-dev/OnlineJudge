@@ -1,0 +1,116 @@
+syntax = "v1"
+
+type (
+	RegisterReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	RegisterResp  {}
+	LoginReq {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	LoginResp {
+		Token string `json:"token"`
+	}
+	GetUserInfoReq  {}
+	GetUserInfoResp {
+		UserId        uint64 `json:"user_id"`
+		UserName      string `json:"user_name"`
+		UserEmail     string `json:"user_email"`
+		UserAvatarUrl string `json:"user_avatar_url"`
+		UserProfile   string `json:"user_profile"`
+		UserRole      string `json:"user_role"`
+	}
+)
+
+type (
+	QuestionReq {
+		Id uint64 `json:"id"`
+	}
+	QuestionInfoResponse {
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	PaginationReq {
+		Page     uint64            `json:"page"`
+		PageSize uint64            `json:"page_size"`
+		Filter   map[string]string `json:"filter"`
+	}
+	QuestionBasicInfo {
+		Id         uint64   `json:"id"`
+		Title      string   `json:"title"`
+		Tags       []string `json:"tags"`
+		Difficulty string   `json:difficulty`
+		AcRate     float64  `json:ac_rate`
+	}
+	PaginationResp {
+		Questions []*QuestionBasicInfo `json:"questions"`
+		Total     uint64               `json:"total"`
+		Page      uint64               `json:"page"`
+		PageSize  uint64               `json:"pagesize"`
+	}
+)
+
+type (
+	JudgeReq {
+		Code       string `json:"code"`
+		Language   string `json:"language"`
+		QuestionId uint64 `json:"question_id"`
+	}
+	JudgeResp {
+		Results []*ExecResult `json:"results"`
+	}
+	ExecResult {
+		Output           string `json:"output"`
+		TimeMilliseconds int64  `json:"time_milliseconds"`
+		MemoryUsage      int64  `json:"memory_usage"`
+		Accepted         bool   `json:"accepted"`
+	}
+)
+
+@server (
+	prefix: api/v1
+	group:  user
+)
+service gateway-api {
+	@handler register
+	post /user/register (RegisterReq) returns (RegisterResp)
+
+	@handler login
+	post /user/login (LoginReq) returns (LoginResp)
+}
+
+@server (
+	prefix:     api/v1
+	group:      user
+	middleware: JWTAuth
+)
+service gateway-api {
+	@handler getUserInfo
+	post /user/info (GetUserInfoReq) returns (GetUserInfoResp)
+}
+
+@server (
+	prefix: api/v1
+	group:  question
+)
+service gateway-api {
+	@handler getQuestionInfo
+	post /question/info (QuestionReq) returns (QuestionInfoResponse)
+
+	@handler pagination
+	post /question/pagination (PaginationReq) returns (PaginationResp)
+}
+
+@server (
+	prefix:  api/v1
+	group:   judge
+	timeout: 60s
+)
+service gateway-api {
+	@handler judge
+	post /judge/judgecode (JudgeReq) returns (JudgeResp)
+}
+

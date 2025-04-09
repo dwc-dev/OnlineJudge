@@ -66,9 +66,8 @@
 import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Message, Lock, User } from '@element-plus/icons-vue'
-import auth from '@/api/modules/auth'
 import { ElMessage } from 'element-plus'
-
+import api from '@/api'
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref(route.params.type || 'login')
@@ -95,13 +94,19 @@ const registerForm = ref({
   password: '',
 })
 
-const handleLogin = () => {}
+const handleLogin = async () => {
+  api.user.login(loginForm.value.email, loginForm.value.password).then(() => {
+    ElMessage.success('登录成功！')
+  })
+}
 
 const handleRegister = async () => {
-  // 错误提示已在基础请求方法和拦截器中完成，此处无需额外处理
-  await auth.register(registerForm.value)
+  await api.user.register(
+    registerForm.value.username,
+    registerForm.value.email,
+    registerForm.value.password,
+  )
   ElMessage.success('注册成功！')
-  router.push(`/auth/login`)
 }
 </script>
 

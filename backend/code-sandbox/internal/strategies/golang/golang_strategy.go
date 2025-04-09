@@ -1,8 +1,8 @@
 package golang
 
 import (
-	"code-sandbox/internal/docker"
-	"code-sandbox/internal/types"
+	"backend/code-sandbox/docker"
+	"backend/code-sandbox/internal/types"
 	"context"
 	"fmt"
 	"strconv"
@@ -46,6 +46,7 @@ func (s *GolangStrategy) Prepare() error {
 }
 
 func (s *GolangStrategy) Compile() error {
+	fmt.Println("开始编译")
 	result, err := docker.ExecInContainer(s.containerID, ExecTimeOutSeconds,
 		[]string{"go", "build", "-o", "/sandbox/main", "/sandbox/main.go"})
 	if err != nil {
@@ -54,11 +55,13 @@ func (s *GolangStrategy) Compile() error {
 	if result.ExitCode != 0 {
 		return fmt.Errorf("编译失败,错误输出:\n%s", result.ErrorOutput)
 	}
+	fmt.Println("编译完成")
 	return nil
 }
 
 func (s *GolangStrategy) Execute() ([]types.ExecResult, error) {
-	defer docker.CleanupContainer(s.containerID, true)
+	fmt.Println("开始运行")
+	// defer docker.CleanupContainer(s.containerID, true)
 	var res []types.ExecResult
 	for idx := range len(s.inputList) {
 		inputPath := "/sandbox/input" + strconv.Itoa(idx) + ".txt"
@@ -70,11 +73,13 @@ func (s *GolangStrategy) Execute() ([]types.ExecResult, error) {
 		if result.ExitCode != 0 {
 			return []types.ExecResult{}, fmt.Errorf("运行失败,错误输出:\n%s", result.ErrorOutput)
 		}
+		fmt.Println("运行完成")
 		res = append(res, types.ExecResult{
 			Output:      result.StandardOutput,
 			Time:        result.Time,
 			MemoryUsage: 0,
 		})
 	}
+	docker.CleanupContainer(s.containerID, true)
 	return res, nil
 }

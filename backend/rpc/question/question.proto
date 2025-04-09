@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package question;
+option go_package = "./question";
+
+message QuestionRequest {
+  uint64 id = 1;
+}
+
+message QuestionInfoResponse {
+  string title = 1;
+  string content = 2;
+}
+
+message QuestionJudgeCaseResponse {
+  string judge_case = 1;
+}
+
+// 分页请求
+message PaginationRequest {
+  uint64 page = 1;
+  uint64 page_size = 2;
+  map<string, string> filter = 3;
+}
+
+// 题目结构
+message QuestionBasicInfo {
+  uint64 id = 1;            // 题目 ID
+  string title = 2;         // 题目标题
+  string difficulty = 3;    // 难度
+  double ac_rate =4;        // 通过率
+  repeated string tags = 5; // 标签
+}
+
+// 分页响应
+message PaginationResponse {
+  repeated QuestionBasicInfo questions = 1; // 当前页的题目列表
+  uint64 total = 2;            // 总条数
+  uint64 page = 3;             // 当前页码
+  uint64 page_size = 4;        // 每页条数
+}
+
+service Question {
+  rpc GetQuestionInfo (QuestionRequest) returns (QuestionInfoResponse);
+  rpc GetQuestionJudgeCase (QuestionRequest) returns (QuestionJudgeCaseResponse);
+  rpc Pagination (PaginationRequest) returns (PaginationResponse);
+}

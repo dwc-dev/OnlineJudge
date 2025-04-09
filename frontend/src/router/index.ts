@@ -9,13 +9,18 @@ const router = createRouter({
       component: () => import('@/views/HomeView.vue'),
     },
     {
-      path: '/problems',
-      name: 'problems',
-      component: () => import('@/views/ProblemView.vue'),
+      path: '/question',
+      name: 'questionList',
+      component: () => import('@/views/QuestionView.vue'),
     },
     {
-      path: '/contests',
-      name: 'contests',
+      path: '/question/:id',
+      name: 'questionDetail',
+      component: () => import('@/views/CodingView.vue'),
+    },
+    {
+      path: '/contest',
+      name: 'contest',
       component: () => import('@/views/ContestView.vue'),
     },
     {

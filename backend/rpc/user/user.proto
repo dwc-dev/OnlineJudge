@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package user;
+option go_package = "./user";
+
+message RegisterReq {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+
+message RegisterResp {
+}
+
+message LoginReq {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResp {
+  string token = 1;
+}
+
+message GetUserInfoReq {
+    uint64 user_id = 1;
+}
+
+message GetUserInfoResp {
+    uint64 user_id = 1;           // 用户ID
+    string user_name = 2;         // 用户昵称
+    string user_email = 3;        // 用户邮箱
+    string user_avatar_url = 4;   // 用户头像URL
+    string user_profile = 5;      // 用户简介
+    string user_role = 6;         // 用户角色：user/admin
+}
+
+service User {
+  rpc Register(RegisterReq) returns (RegisterResp);
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc GetUserInfo (GetUserInfoReq) returns (GetUserInfoResp);
+}

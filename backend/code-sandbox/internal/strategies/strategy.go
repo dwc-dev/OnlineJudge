@@ -1,13 +1,13 @@
 package strategies
 
 import (
-	"code-sandbox/internal/strategies/c"
-	"code-sandbox/internal/strategies/cpp"
-	"code-sandbox/internal/strategies/golang"
-	"code-sandbox/internal/strategies/java"
-	"code-sandbox/internal/strategies/python"
-	"code-sandbox/internal/strategies/rust"
-	"code-sandbox/internal/types"
+	"backend/code-sandbox/internal/strategies/c"
+	"backend/code-sandbox/internal/strategies/cpp"
+	"backend/code-sandbox/internal/strategies/golang"
+	"backend/code-sandbox/internal/strategies/java"
+	"backend/code-sandbox/internal/strategies/python"
+	"backend/code-sandbox/internal/strategies/rust"
+	"backend/code-sandbox/internal/types"
 	"errors"
 )
 

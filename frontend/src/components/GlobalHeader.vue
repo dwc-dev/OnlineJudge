@@ -3,8 +3,8 @@
     <RouterLink to="/" class="mr-5 ml-5 text-xl font-bold text-gray-800">OnlineJudge</RouterLink>
     <el-menu mode="horizontal" :default-active="activeIndex" class="flex-1 gap-5" :router="true">
       <el-menu-item index="/">主页</el-menu-item>
-      <el-menu-item index="/problems">题库</el-menu-item>
-      <el-menu-item index="/contests">比赛</el-menu-item>
+      <el-menu-item index="/question">题库</el-menu-item>
+      <el-menu-item index="/contest">比赛</el-menu-item>
     </el-menu>
     <div>
       <el-button plain class="mr-5" @click="handleLogin">登录/注册</el-button>
