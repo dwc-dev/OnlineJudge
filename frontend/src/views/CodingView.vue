@@ -38,7 +38,7 @@
             </el-popconfirm>
             <el-icon
               @click="formatCode"
-              class="cursor-pointer rounded-md hover:bg-gray-200"
+              class="cursor-pointer rounded-md !p-0.5 hover:bg-gray-200"
               title="格式化代码"
               :size="25"
             >
@@ -77,6 +77,9 @@
         </div>
       </div>
     </div>
+
+    <!-- 评测结果组件 -->
+    <JudgeResult ref="judgeResultRef" />
   </div>
 </template>
 
@@ -88,6 +91,7 @@ import { MdPreview } from 'md-editor-v3'
 import { ElMessage } from 'element-plus'
 import { ArrowRight, ArrowLeft, CaretRight, Loading } from '@element-plus/icons-vue'
 import AIChat from '@/components/AIChat.vue'
+import JudgeResult from '@/components/JudgeResult.vue'
 import 'md-editor-v3/lib/preview.css'
 import * as monaco from 'monaco-editor'
 
@@ -106,6 +110,7 @@ const editorContainer = ref<HTMLElement | null>(null)
 let editor: monaco.editor.IStandaloneCodeEditor | null = null
 
 const aiChatExpanded = ref(false)
+const judgeResultRef = ref()
 
 // 语言映射配置
 const editorLanguageMap: Record<string, string> = {
@@ -209,7 +214,8 @@ const submitCode = () => {
     .judgeCode(code.value, judgeLanguageMap[selectedLanguage.value], Number(id))
     .then((res) => {
       judgeResults.value = res.data.results
-      ElMessage.success('代码已提交')
+      // 显示评测结果对话框
+      judgeResultRef.value.open(judgeResults.value)
     })
     .catch((error) => {
       ElMessage.error(error.message)

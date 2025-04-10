@@ -77,7 +77,7 @@ func (d *UserDao) CompareUserPassword(ctx context.Context, userEmail string, pas
 	return user.ID, user.UserRole, nil
 }
 
-func (d *UserDao) GetUserInfoById(ctx context.Context, userId uint) (*model.User, error) {
+func (d *UserDao) GetUserInfoById(ctx context.Context, userId uint64) (*model.User, error) {
 	var user model.User
 	err := d.db.WithContext(ctx).
 		Select("id", "user_name", "user_email", "user_avatar_url", "user_profile", "user_role").

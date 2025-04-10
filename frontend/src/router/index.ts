@@ -32,6 +32,16 @@ const router = createRouter({
       path: '/auth',
       redirect: '/auth/login', // 默认重定向到登录页
     },
+    {
+      path: '/space/:id',
+      name: 'space',
+      component: () => import('@/views/SpaceView.vue'),
+    },
+    {
+      path: '/center/:id',
+      name: 'center',
+      component: () => import('@/views/CenterView.vue'),
+    },
   ],
 })
 

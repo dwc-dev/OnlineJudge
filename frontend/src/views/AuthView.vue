@@ -67,10 +67,12 @@ import { ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Message, Lock, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 import api from '@/api'
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref(route.params.type || 'login')
+const userStore = useUserStore()
 
 const handleTabChange = (tabName: string) => {
   router.push(`/auth/${tabName}`)
@@ -95,9 +97,30 @@ const registerForm = ref({
 })
 
 const handleLogin = async () => {
-  api.user.login(loginForm.value.email, loginForm.value.password).then(() => {
-    ElMessage.success('登录成功！')
-  })
+  api.user
+    .login(loginForm.value.email, loginForm.value.password)
+    .then(() => {
+      api.user
+        .getUserInfo()
+        .then((res) => {
+          userStore.setUserInfo({
+            uid: res.data.user_id,
+            username: res.data.user_name,
+            avatar: res.data.user_avatar_url,
+            email: res.data.user_email,
+            role: res.data.user_role,
+            profile: res.data.user_profile,
+          })
+          ElMessage.success('登录成功！')
+          router.push('/')
+        })
+        .catch((err) => {
+          ElMessage.error(err.message)
+        })
+    })
+    .catch((err) => {
+      ElMessage.error(err.message)
+    })
 }
 
 const handleRegister = async () => {

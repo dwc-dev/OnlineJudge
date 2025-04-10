@@ -37,3 +37,8 @@ func (s *UserServer) GetUserInfo(ctx context.Context, in *user.GetUserInfoReq) (
 	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
 	return l.GetUserInfo(in)
 }
+
+func (s *UserServer) GetPublicInfo(ctx context.Context, in *user.GetPublicInfoReq) (*user.GetPublicInfoResp, error) {
+	l := logic.NewGetPublicInfoLogic(ctx, s.svcCtx)
+	return l.GetPublicInfo(in)
+}

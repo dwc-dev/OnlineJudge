@@ -6,8 +6,20 @@
       <el-menu-item index="/question">题库</el-menu-item>
       <el-menu-item index="/contest">比赛</el-menu-item>
     </el-menu>
-    <div>
+    <div v-if="!isLogin">
       <el-button plain class="mr-5" @click="handleLogin">登录/注册</el-button>
+    </div>
+    <div v-else class="mr-5">
+      <el-dropdown>
+        <el-avatar :size="40" :src="userStore.avatar" class="cursor-pointer" />
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="handleSpace">我的空间</el-dropdown-item>
+            <el-dropdown-item @click="handleCenter">个人中心</el-dropdown-item>
+            <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
@@ -19,12 +31,37 @@
 </style>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
+import jwt from '@/api/http/jwt'
+import api from '@/api'
 
+const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const activeIndex = ref(route.path)
+const isLogin = computed(() => userStore.isLogin)
+
+onMounted(() => {
+  if (jwt.getToken()) {
+    api.user
+      .getUserInfo()
+      .then((res) => {
+        userStore.setUserInfo({
+          uid: res.data.user_id,
+          username: res.data.user_name,
+          avatar: res.data.user_avatar_url,
+          email: res.data.user_email,
+          role: res.data.user_role,
+          profile: res.data.user_profile,
+        })
+      })
+      .catch((err) => {
+        ElMessage.error(err.message)
+      })
+  }
+})
 
 // 监听路由变化，更新激活菜单项
 watch(
@@ -36,5 +73,19 @@ watch(
 
 const handleLogin = () => {
   router.push('/auth/login')
+}
+
+const handleLogout = () => {
+  jwt.clearToken()
+  userStore.logout()
+  router.push('/')
+}
+
+const handleSpace = () => {
+  router.push(`/space/${userStore.uid}`)
+}
+
+const handleCenter = () => {
+  router.push(`/center/${userStore.uid}`)
 }
 </script>

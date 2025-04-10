@@ -10,6 +10,17 @@ type ExecResult struct {
 	Accepted         bool   `json:"accepted"`
 }
 
+type GetPublicInfoReq struct {
+	UserId uint64 `json:"user_id"`
+}
+
+type GetPublicInfoResp struct {
+	UserId        uint64 `json:"user_id"`
+	UserName      string `json:"user_name"`
+	UserAvatarUrl string `json:"user_avatar_url"`
+	UserProfile   string `json:"user_profile"`
+}
+
 type GetUserInfoReq struct {
 }
 

@@ -25,6 +25,17 @@ message GetUserInfoReq {
     uint64 user_id = 1;
 }
 
+message GetPublicInfoReq {
+    uint64 user_id = 1;
+}
+
+message GetPublicInfoResp {
+    uint64 user_id = 1;           // 用户ID
+    string user_name = 2;         // 用户昵称
+    string user_avatar_url = 4;   // 用户头像URL
+    string user_profile = 5;      // 用户简介
+}
+
 message GetUserInfoResp {
     uint64 user_id = 1;           // 用户ID
     string user_name = 2;         // 用户昵称
@@ -34,8 +45,11 @@ message GetUserInfoResp {
     string user_role = 6;         // 用户角色：user/admin
 }
 
+
+
 service User {
   rpc Register(RegisterReq) returns (RegisterResp);
   rpc Login(LoginReq) returns (LoginResp);
   rpc GetUserInfo (GetUserInfoReq) returns (GetUserInfoResp);
+  rpc GetPublicInfo (GetPublicInfoReq) returns (GetPublicInfoResp);
 }

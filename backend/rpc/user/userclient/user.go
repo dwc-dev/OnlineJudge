@@ -14,17 +14,20 @@ import (
 )
 
 type (
-	GetUserInfoReq  = user.GetUserInfoReq
-	GetUserInfoResp = user.GetUserInfoResp
-	LoginReq        = user.LoginReq
-	LoginResp       = user.LoginResp
-	RegisterReq     = user.RegisterReq
-	RegisterResp    = user.RegisterResp
+	GetPublicInfoReq  = user.GetPublicInfoReq
+	GetPublicInfoResp = user.GetPublicInfoResp
+	GetUserInfoReq    = user.GetUserInfoReq
+	GetUserInfoResp   = user.GetUserInfoResp
+	LoginReq          = user.LoginReq
+	LoginResp         = user.LoginResp
+	RegisterReq       = user.RegisterReq
+	RegisterResp      = user.RegisterResp
 
 	User interface {
 		Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
 		GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
+		GetPublicInfo(ctx context.Context, in *GetPublicInfoReq, opts ...grpc.CallOption) (*GetPublicInfoResp, error)
 	}
 
 	defaultUser struct {
@@ -51,4 +54,9 @@ func (m *defaultUser) Login(ctx context.Context, in *LoginReq, opts ...grpc.Call
 func (m *defaultUser) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUserInfo(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetPublicInfo(ctx context.Context, in *GetPublicInfoReq, opts ...grpc.CallOption) (*GetPublicInfoResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetPublicInfo(ctx, in, opts...)
 }

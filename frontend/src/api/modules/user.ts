@@ -12,4 +12,8 @@ export const user = {
   register(username: string, email: string, password: string) {
     return post('/user/register', { username, email, password })
   },
+
+  getUserPublicInfoById(id: number) {
+    return post('/user/public_info', { user_id: id })
+  },
 }

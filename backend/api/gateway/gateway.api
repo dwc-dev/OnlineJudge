@@ -23,6 +23,15 @@ type (
 		UserProfile   string `json:"user_profile"`
 		UserRole      string `json:"user_role"`
 	}
+	GetPublicInfoReq {
+		UserId uint64 `json:"user_id"`
+	}
+	GetPublicInfoResp {
+		UserId        uint64 `json:"user_id"`
+		UserName      string `json:"user_name"`
+		UserAvatarUrl string `json:"user_avatar_url"`
+		UserProfile   string `json:"user_profile"`
+	}
 )
 
 type (
@@ -80,6 +89,9 @@ service gateway-api {
 
 	@handler login
 	post /user/login (LoginReq) returns (LoginResp)
+
+	@handler getPublicInfo
+	post /user/public_info (GetPublicInfoReq) returns (GetPublicInfoResp)
 }
 
 @server (
