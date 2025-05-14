@@ -1,5 +1,5 @@
 import axios from 'axios'
-import jwt from './jwt'
+import token from './token'
 import type { InternalRequestConfig, RequestConfig } from './types'
 
 const instance = axios.create({
@@ -9,9 +9,9 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config: InternalRequestConfig) => {
   if (config.needToken) {
-    const token = jwt.getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    const accessToken = token.getAccessToken()
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
     }
   }
   return config
@@ -19,21 +19,39 @@ instance.interceptors.request.use((config: InternalRequestConfig) => {
 
 instance.interceptors.response.use(
   (response) => {
-    const data = response.data?.data
-    // data.token != null 会同时过滤掉 null 和 undefined 的值
+    const data = response.data.data
+    // data.access_token != null 会同时过滤掉 null 和 undefined 的值
     // null == undefined  true
     // null === undefined false
-    if (data && data.token != null) {
-      jwt.setToken(data.token)
+    if (data && data.access_token != null) {
+      token.setAccessToken(data.access_token)
+    }
+    if (data && data.refresh_token != null) {
+      token.setRefreshToken(data.refresh_token)
     }
     return response.data
   },
-  (error) => {
+  async (error) => {
     if (!error.response) {
       error.message = '网络异常，请检查你的网络连接'
       return Promise.reject(error)
     }
     const { data } = error.response
+    // AccessToken 无效
+    if (data && data.code === 40101) {
+      console.log('AccessToken 无效', error.config.url)
+      await token.refreshToken()
+      error.config.headers.Authorization = `Bearer ${token.getAccessToken()}`
+      return instance.request(error.config)
+    }
+    // RefreshToken 无效
+    if (data && data.code === 40102) {
+      console.log('RefreshToken 无效', error.config.url)
+      token.clearAccessToken()
+      token.clearRefreshToken()
+      window.location.href = '/auth/login'
+      return Promise.reject(error)
+    }
     const msg = data ? data.msg : undefined
     //a || b 表达式的返回值是“第一个 truthy 值”或最后一个值
     error.message = msg || '未知错误'
@@ -47,7 +65,7 @@ export function get(url: string, params?: Record<string, unknown>, config?: Requ
 
 export function post(
   url: string,
-  data?: Record<string, unknown> | FormData | Blob | File,
+  data?: Record<string, unknown> | FormData | Blob | File | unknown,
   config?: RequestConfig,
 ) {
   return instance.post(url, data, config)

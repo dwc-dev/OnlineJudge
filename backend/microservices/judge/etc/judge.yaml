@@ -1,0 +1,15 @@
+Name: microservice.judge
+ListenOn: 0.0.0.0:6003
+Timeout: 60000
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: microservice.judge
+QuestionRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.question
+  NonBlock: true
+Mysql:
+  DataSource: "user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"

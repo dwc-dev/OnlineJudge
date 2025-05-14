@@ -1,0 +1,7 @@
+syntax = "v1"
+
+import "./apis/user.api"
+import "./apis/judge.api"
+import "./apis/question.api"
+import "./apis/competition.api"
+import "./apis/ai.api"

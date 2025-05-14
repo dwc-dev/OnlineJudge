@@ -3,9 +3,16 @@
     <el-card class="h-full flex-1" :body-style="{ height: '100%' }">
       <el-skeleton :rows="10" animated v-if="loading" />
       <div v-else class="flex h-full w-full flex-col">
-        <MdPreview :modelValue="questionTitle" previewTheme="vuepress" />
+        <div class="flex w-full items-center justify-between border-b border-gray-300 pb-1">
+          <span class="text-2xl font-bold">{{ questionTitle }}</span>
+          <div class="flex gap-2 text-sm text-gray-500">
+            <span>时间限制: {{ judgeConfig.timeout_millisecond }}ms</span>
+            <span>内存限制: {{ judgeConfig.memory_limit_mib }}MB</span>
+            <span>栈限制: {{ judgeConfig.stack_limit_mib }}MB</span>
+          </div>
+        </div>
         <el-scrollbar class="h-full flex-1 pr-2">
-          <MdPreview :modelValue="questionContent" previewTheme="vuepress" />
+          <MdPreview :modelValue="questionContent" previewTheme="github" codeTheme="github" />
         </el-scrollbar>
       </div>
     </el-card>
@@ -37,12 +44,12 @@
               ></template>
             </el-popconfirm>
             <el-icon
-              @click="formatCode"
+              @click="copyCode"
               class="cursor-pointer rounded-md !p-0.5 hover:bg-gray-200"
-              title="格式化代码"
+              title="复制代码"
               :size="25"
             >
-              <MagicStick />
+              <CopyDocument />
             </el-icon>
           </div>
         </div>
@@ -53,6 +60,7 @@
     <div
       class="relative flex h-full flex-col"
       :class="{ 'w-12': !aiChatExpanded, 'flex-1': aiChatExpanded }"
+      v-if="isLogin && !isCompetitionQuestionPage"
     >
       <el-button
         type="primary"
@@ -66,7 +74,7 @@
           <arrow-left v-else />
         </el-icon>
       </el-button>
-      <el-card v-if="aiChatExpanded" class="h-full w-full">
+      <el-card v-if="aiChatExpanded" class="h-full w-full" :body-style="{ height: '100%' }">
         <AIChat />
       </el-card>
       <div v-else class="flex h-full w-full items-center justify-center rounded-md bg-gray-100">
@@ -86,26 +94,42 @@
 <script setup lang="ts">
 import api from '@/api'
 import { useRoute } from 'vue-router'
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { MdPreview } from 'md-editor-v3'
 import { ElMessage } from 'element-plus'
-import { ArrowRight, ArrowLeft, CaretRight, Loading } from '@element-plus/icons-vue'
+import { ArrowRight, ArrowLeft, CaretRight, Loading, CopyDocument } from '@element-plus/icons-vue'
 import AIChat from '@/components/AIChat.vue'
 import JudgeResult from '@/components/JudgeResult.vue'
 import 'md-editor-v3/lib/preview.css'
 import * as monaco from 'monaco-editor'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
-const id = route.params.id
+const userStore = useUserStore()
+const isLogin = computed(() => userStore.isLogin)
 const questionTitle = ref('')
 const questionContent = ref('')
 const loading = ref(true)
 const submitting = ref(false)
 
+interface JudgeConfig {
+  memory_limit_mib: number
+  stack_limit_mib: number
+  timeout_millisecond: number
+}
+const judgeConfig = ref<JudgeConfig>({
+  memory_limit_mib: NaN,
+  stack_limit_mib: NaN,
+  timeout_millisecond: NaN,
+})
+
+const isCompetitionQuestionPage = computed(() => route.name === 'competitionQuestion')
+const id = computed(() => Number(route.params.id))
+const qid = computed(() => route.params.qid as string)
+
 const code = ref('')
 const selectedLanguage = ref('C')
 const languages = ['C', 'C++', 'Java', 'Python', 'Go', 'Rust']
-const judgeResults = ref([])
 const editorContainer = ref<HTMLElement | null>(null)
 let editor: monaco.editor.IStandaloneCodeEditor | null = null
 
@@ -141,21 +165,37 @@ const defaultCodes: Record<string, string> = {
 }
 
 onMounted(() => {
-  api.question
-    .getQuestionTitleAndContent(Number(id))
-    .then((res) => {
-      questionTitle.value = '## ' + res.data.title
-      questionContent.value = res.data.content
-      document.title = id + ' - ' + res.data.title
-      loading.value = false
-
-      // 初始化Monaco编辑器
-      initEditor()
-    })
-    .catch(() => {
-      ElMessage.error('获取题目失败')
-      loading.value = false
-    })
+  if (isCompetitionQuestionPage.value) {
+    api.competition
+      .getCompetitionQuestionInfo(id.value, qid.value)
+      .then((res) => {
+        judgeConfig.value = res.data.judge_config
+        questionTitle.value = res.data.title
+        questionContent.value = res.data.content
+        document.title = 'OnlineJudge - 比赛 - ' + qid.value + '.' + res.data.title
+        loading.value = false
+        initEditor()
+      })
+      .catch(() => {
+        ElMessage.error('获取题目失败')
+        loading.value = false
+      })
+  } else {
+    api.question
+      .getQuestionBasicInfo(id.value)
+      .then((res) => {
+        judgeConfig.value = res.data.judge_config
+        questionTitle.value = res.data.title
+        questionContent.value = res.data.content
+        document.title = 'OnlineJudge - ' + id.value + '.' + res.data.title
+        loading.value = false
+        initEditor()
+      })
+      .catch(() => {
+        ElMessage.error('获取题目失败')
+        loading.value = false
+      })
+  }
 })
 
 onBeforeUnmount(() => {
@@ -181,6 +221,16 @@ watch(selectedLanguage, (newLang) => {
   }
 })
 
+// 添加对aiChatExpanded变化的监听
+watch(aiChatExpanded, () => {
+  // 在DOM更新后重新布局编辑器
+  setTimeout(() => {
+    if (editor) {
+      editor.layout()
+    }
+  }, 0)
+})
+
 const initEditor = () => {
   if (editorContainer.value) {
     editor = monaco.editor.create(editorContainer.value, {
@@ -190,7 +240,6 @@ const initEditor = () => {
       minimap: { enabled: false },
       fontSize: 16,
     })
-
     // 监听编辑器内容变化
     editor.onDidChangeModelContent(() => {
       if (editor) {
@@ -202,6 +251,10 @@ const initEditor = () => {
 
 const submitCode = () => {
   if (!editor) return
+  if (!isLogin.value) {
+    ElMessage.warning('登陆后才能提交代码~')
+    return
+  }
   if (submitting.value) {
     ElMessage.warning('代码已在评测中~')
     return
@@ -210,19 +263,36 @@ const submitCode = () => {
   code.value = editor.getValue()
   submitting.value = true
 
-  api.judge
-    .judgeCode(code.value, judgeLanguageMap[selectedLanguage.value], Number(id))
-    .then((res) => {
-      judgeResults.value = res.data.results
-      // 显示评测结果对话框
-      judgeResultRef.value.open(judgeResults.value)
-    })
-    .catch((error) => {
-      ElMessage.error(error.message)
-    })
-    .finally(() => {
-      submitting.value = false
-    })
+  if (isCompetitionQuestionPage.value) {
+    api.competition
+      .submitCompetitionQuestion(
+        id.value,
+        qid.value,
+        code.value,
+        judgeLanguageMap[selectedLanguage.value],
+      )
+      .then((res) => {
+        judgeResultRef.value.open(res.data)
+      })
+      .catch((error) => {
+        ElMessage.error(error.message)
+      })
+      .finally(() => {
+        submitting.value = false
+      })
+  } else {
+    api.judge
+      .judgeCode(code.value, judgeLanguageMap[selectedLanguage.value], id.value)
+      .then((res) => {
+        judgeResultRef.value.open(res.data)
+      })
+      .catch((error) => {
+        ElMessage.error(error.message)
+      })
+      .finally(() => {
+        submitting.value = false
+      })
+  }
 }
 
 const resetCode = () => {
@@ -230,9 +300,10 @@ const resetCode = () => {
   editor?.setValue(defaultCodes[selectedLanguage.value])
 }
 
-const formatCode = () => {
+const copyCode = () => {
   if (!editor) return
-  editor?.getAction('editor.action.formatDocument')?.run()
+  navigator.clipboard.writeText(editor.getValue())
+  ElMessage.success('代码已复制到剪贴板！')
 }
 </script>
 

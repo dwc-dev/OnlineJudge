@@ -1,26 +1,50 @@
 package sandbox
 
 import (
+	"backend/code-sandbox/internal/docker"
 	"backend/code-sandbox/internal/strategies"
-	"backend/code-sandbox/internal/types"
+	"backend/code-sandbox/types"
+	"context"
 )
 
-func RunCode(language, code string, inputList []string) ([]types.ExecResult, error) {
-	languageStrategy, err := strategies.GetStrategy(language, code, inputList)
+type Sandbox struct {
+	dockerClient *docker.DockerClient
+}
+
+func NewSandbox() (*Sandbox, error) {
+	dockerClient, err := docker.NewDockerClient()
 	if err != nil {
-		return []types.ExecResult{}, err
+		return nil, err
 	}
-	err = languageStrategy.Prepare()
+	return &Sandbox{dockerClient: dockerClient}, nil
+}
+
+func (s *Sandbox) RunCode(ctx context.Context, config *types.RunConfig) (*types.Result, error) {
+	// 两类错误：系统错误返回 error，业务错误返回 Result
+	languageStrategy, err := strategies.GetStrategy(config, s.dockerClient)
 	if err != nil {
-		return []types.ExecResult{}, err
+		return nil, err
 	}
-	err = languageStrategy.Compile()
+
+	// 准备
+	err = languageStrategy.Prepare(ctx)
 	if err != nil {
-		return []types.ExecResult{}, err
+		return nil, err
 	}
-	res, err := languageStrategy.Execute()
+
+	// 编译
+	result, err := languageStrategy.Compile(ctx)
 	if err != nil {
-		return []types.ExecResult{}, err
+		return nil, err
+	}
+	if result != nil {
+		return result, nil
+	}
+
+	// 运行
+	res, err := languageStrategy.Execute(ctx)
+	if err != nil {
+		return nil, err
 	}
 	return res, nil
 }

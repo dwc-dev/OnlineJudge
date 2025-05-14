@@ -1,0 +1,64 @@
+type ExecDetail {
+	Output           string `json:"output"`            // 程序输出
+	TimeMilliseconds int64  `json:"time_milliseconds"` // 运行时间，单位为毫秒（Milliseconds）
+	MemoryUsage      int64  `json:"memory_usage_kb"`   // 占用内存，单位为KB
+	Timeout          bool   `json:"timeout"`           // 是否超时
+	MemoryOut        bool   `json:"memory_out"`        // 是否内存超限
+	RuntimeError     bool   `json:"runtime_error"`     // 是否运行时错误
+	StackOverflow    bool   `json:"stack_overflow"`    // 是否栈溢出
+	Accepted         bool   `json:"accepted"`          // 是否通过
+}
+type JudgeInfo {
+	JudgeId    uint64 `json:"judge_id"`
+	UserId     uint64 `json:"user_id"`
+	QuestionId uint64 `json:"question_id"`
+	Language   string `json:"language"`
+	Code       string `json:"code"`
+	ExecResult string `json:"exec_result"`
+	Accepted   bool   `json:"accepted"`
+	CreateAt   string `json:"create_at"`
+	UpdateAt   string `json:"update_at"`
+}
+type (
+	JudgeReq {
+		Code       string `json:"code"`
+		Language   string `json:"language"`
+		QuestionId uint64 `json:"question_id"`
+	}
+	JudgeResp {
+		ExecDetails        []*ExecDetail `json:"exec_details"`
+		CompileError       bool          `json:"compile_error"`
+		CompileErrorOutput string        `json:"compile_error_output"`
+	}
+	GetJudgeListReq {
+		Page     uint64 `json:"page"`
+		PageSize uint64 `json:"page_size"`
+	}
+	GetJudgeListResp {
+		JudgeList []*JudgeInfo `json:"judge_list"`
+		Total     uint64       `json:"total"`
+		Page      uint64       `json:"page"`
+		PageSize  uint64       `json:"page_size"`
+	}
+)
+
+@server (
+	prefix:     api/v1
+	group:      judge
+	timeout:    600s
+	middleware: AccessTokenAuth
+)
+service gateway-api {
+	@handler judge
+	post /judge/judgecode (JudgeReq) returns (JudgeResp)
+}
+
+@server (
+	prefix:     api/v1
+	group:      judge
+	middleware: AccessTokenAuth
+)
+service gateway-api {
+	@handler getJudgeList
+	post /judge/list (GetJudgeListReq) returns (GetJudgeListResp)
+}

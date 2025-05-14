@@ -1,3 +1,11 @@
+###
+# 该脚本用于运行所有 Go 程序，包括微服务和网关
+# 使用方法：python run.py
+# 按 Ctrl+C 退出所有 Go 程序
+# 如果需要编译，请设置 compiler_flag = True
+# 如果不需要编译，请设置 compiler_flag = False
+###
+
 import subprocess
 import os
 import signal
@@ -7,10 +15,11 @@ import time
 go_processes = []
 
 go_files = {
-    "api/gateway": "gateway.go",
-    "rpc/user": "user.go",
-    "rpc/question": "question.go",
-    "rpc/judge": "judge.go",
+    "microservices/user": "user.go",
+    "microservices/question": "question.go",
+    "microservices/judge": "judge.go",
+    "microservices/competition": "competition.go",
+    "gateway": "gateway.go",
 }
 
 compiler_flag = True
@@ -59,16 +68,13 @@ def cleanup():
 
 atexit.register(cleanup)
 
-if not os.path.exists("./output"):
-    os.makedirs("./output")
-
 for go_src_path, go_src_file in go_files.items():
     exe_name = build_go_file(go_src_path, go_src_file)
     if exe_name:
         proc = start_exe(go_src_path, exe_name, f"./{go_src_path}")
         go_processes.append(proc)
 
-print("所有 Go 程序已启动。Python 程序继续运行...\n按 Ctrl+C 退出")
+print("所有 Go 程序已启动\n按 Ctrl+C 退出所有 Go 程序")
 
 try:
     while True:

@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package question;
+option go_package = "./question";
+
+message QuestionInfo {
+  uint64 id = 1;
+  string title = 2;
+  string content = 3;
+  string tags = 4;
+  string difficulty = 5;
+  uint64 submit_num = 6;
+  uint64 accepted_num = 7;
+  string judge_case = 8;
+  string judge_config = 9;
+  string visible_scope = 10;
+  string create_at = 11;
+  string update_at = 12;
+}
+
+// 添加题目
+message AddQuestionReq { QuestionInfo question_info = 1; }
+message AddQuestionResp {}
+
+// 删除题目
+message DeleteQuestionReq { uint64 id = 1; }
+message DeleteQuestionResp {}
+
+// 更新题目
+message UpdateQuestionReq { QuestionInfo question_info = 1; }
+message UpdateQuestionResp {}
+
+// 获取题目信息（单道题目）
+message GetQuestionInfoReq {
+  uint64 id = 1;
+  map<string, string> filter = 2;
+  repeated string col = 3;
+}
+message GetQuestionInfoResp { QuestionInfo question_info = 1; }
+
+// 获取题目列表
+message GetQuestionListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  map<string, string> filter = 3;
+  repeated string col = 4;
+}
+message GetQuestionListResp {
+  repeated QuestionInfo question_list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 page_size = 4;
+}
+
+// 获取题目评测用例
+message GetQuestionJudgeCaseReq { uint64 id = 1; }
+message GetQuestionJudgeCaseResp { string judge_case = 1; }
+
+// 获取题目评测配置
+message GetQuestionJudgeConfigReq { uint64 id = 1; }
+message GetQuestionJudgeConfigResp { string judge_config = 1; }
+
+// 题目服务
+service Question {
+  rpc AddQuestion(AddQuestionReq) returns (AddQuestionResp);
+  rpc DeleteQuestion(DeleteQuestionReq) returns (DeleteQuestionResp);
+  rpc UpdateQuestion(UpdateQuestionReq) returns (UpdateQuestionResp);
+  rpc GetQuestionInfo(GetQuestionInfoReq) returns (GetQuestionInfoResp);
+  rpc GetQuestionList(GetQuestionListReq) returns (GetQuestionListResp);
+
+  rpc GetQuestionJudgeCase(GetQuestionJudgeCaseReq)
+      returns (GetQuestionJudgeCaseResp);
+
+  rpc GetQuestionJudgeConfig(GetQuestionJudgeConfigReq)
+      returns (GetQuestionJudgeConfigResp);
+}

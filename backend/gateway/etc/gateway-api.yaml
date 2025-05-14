@@ -1,0 +1,33 @@
+Name: gateway-api
+Host: 0.0.0.0
+Port: 8888
+CORSOrigins:
+  - "http://localhost:5173"
+UserRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.user
+  NonBlock: true
+QuestionRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.question
+  NonBlock: true
+JudgeRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.judge
+  NonBlock: true
+  Timeout: 60000
+CompetitionRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.competition
+  NonBlock: true
+AIServiceURL: http://localhost:6005
+JWTConf:
+  AccessSecret: "1234567890"

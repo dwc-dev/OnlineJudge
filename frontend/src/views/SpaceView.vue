@@ -8,7 +8,14 @@
             <el-avatar
               :size="100"
               :src="userInfo.user_avatar_url"
-              class="border-4 border-white shadow-lg"
+              class="cursor-pointer border-4 border-white shadow-lg"
+              @click="showPreview = true"
+            />
+            <el-image-viewer
+              v-if="showPreview"
+              :url-list="[userInfo.user_avatar_url]"
+              :initial-index="0"
+              @close="showPreview = false"
             />
             <span class="mt-4 ml-4 text-2xl font-bold text-gray-800">{{ userInfo.user_name }}</span>
           </div>
@@ -44,7 +51,7 @@
 
         <!-- 右侧信息 -->
         <div class="col-span-1">
-          <!-- 数据统计 -->
+          <!-- 数据统计
           <el-card shadow="never" class="mb-6">
             <div class="grid grid-cols-3 gap-4 text-center">
               <div class="p-3">
@@ -60,8 +67,7 @@
                 <p class="text-sm text-gray-500">尝试题数</p>
               </div>
             </div>
-          </el-card>
-
+          </el-card> -->
           <!-- 用户信息 -->
           <el-card shadow="never">
             <template #header>
@@ -78,7 +84,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-500">注册时间</span>
-                <span>{{ new Date().toLocaleDateString() }}</span>
+                <span>{{ new Date(userInfo.create_at).toLocaleDateString() }}</span>
               </div>
             </div>
           </el-card>
@@ -106,8 +112,10 @@ const userInfo = ref({
   user_avatar_url: '',
   user_profile: '',
   user_role: '',
+  create_at: '',
 })
 const role = ref('')
+const showPreview = ref(false)
 
 onMounted(async () => {
   try {
@@ -115,8 +123,8 @@ onMounted(async () => {
     userInfo.value = res.data
     role.value = userInfo.value.user_role === 'admin' ? '管理员' : '普通用户'
     document.title = `OnlineJudge - ${userInfo.value.user_name}的个人空间`
-  } catch (error) {
-    ElMessage.error(error.message)
+  } catch {
+    ElMessage.error('获取用户信息失败')
   }
 })
 </script>

@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package judge;
+option go_package = "./judge";
+
+message JudgeReq {
+  string code = 1;
+  string language = 2;
+  uint64 question_id = 3;
+  uint64 user_id = 4;
+  string judge_type = 5;
+}
+
+message GetJudgeListReq {
+  uint64 user_id = 1;
+  uint64 page = 2;
+  uint64 page_size = 3;
+  string judge_type = 4;
+}
+
+message JudgeInfo {
+  uint64 judge_id = 1;
+  uint64 user_id = 2;
+  uint64 question_id = 3;
+  string language = 4;
+  string code = 5;
+  string exec_result = 6;
+  bool accepted = 7;
+  string create_at = 8;
+  string update_at = 9;
+}
+
+message GetJudgeListResp {
+  repeated JudgeInfo judge_list = 1;
+  uint64 total = 2;     // 总条数
+  uint64 page = 3;      // 当前页码
+  uint64 page_size = 4; // 每页条数
+}
+
+message ExecDetail {
+  string output = 1;
+  int64 time_milliseconds = 2;
+  int64 memory_usage = 3;
+  bool timeout = 4;
+  bool memory_out = 5;
+  bool runtime_error = 6;
+  bool stack_overflow = 7;
+  bool accepted = 8;
+}
+
+message JudgeResp {
+  repeated ExecDetail exec_details = 1;
+  bool compile_error = 2;
+  string compile_error_output = 3;
+  uint64 judge_id = 4;
+}
+
+message GetJudgeInfoReq { uint64 judge_id = 1; }
+
+message GetJudgeInfoResp { JudgeInfo judge_info = 1; }
+
+service Judge {
+  rpc Judge(JudgeReq) returns (JudgeResp);
+  rpc GetJudgeList(GetJudgeListReq) returns (GetJudgeListResp);
+  rpc GetJudgeInfo(GetJudgeInfoReq) returns (GetJudgeInfoResp);
+}

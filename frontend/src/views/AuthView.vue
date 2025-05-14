@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Message, Lock, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -80,6 +80,10 @@ const handleTabChange = (tabName: string) => {
 
 watchEffect(() => {
   activeTab.value = route.params.type || 'login'
+})
+
+onMounted(() => {
+  document.title = 'OnlineJudge - 登录/注册'
 })
 
 const loginSentence = 'Your journey continues here.'

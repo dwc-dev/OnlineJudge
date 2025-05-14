@@ -35,14 +35,15 @@ func FromError(err error) (*pb.RpcError, bool) {
 }
 
 var (
-	InvalidParams   = NewRpcError(codes.InvalidArgument, errors.InvalidParams)
-	UserNoFound     = NewRpcError(codes.NotFound, errors.UserNoFound)
-	InvalidPassword = NewRpcError(codes.Unauthenticated, errors.InvalidPassword)
-
-	EmailAlreadyRegister    = NewRpcError(codes.AlreadyExists, errors.EmailAlreadyRegister)
-	UserNameAlreadyRegister = NewRpcError(codes.AlreadyExists, errors.UserNameAlreadyRegister)
-
-	ServerError      = NewRpcError(codes.Internal, errors.ServerError)
-	DBError          = NewRpcError(codes.Internal, errors.DBError)
-	GenerateJWTError = NewRpcError(codes.Internal, errors.GenerateJWTError)
+	InvalidParams               = NewRpcError(codes.InvalidArgument, errors.InvalidParams)
+	UserNoFound                 = NewRpcError(codes.NotFound, errors.UserNoFound)
+	InvalidPassword             = NewRpcError(codes.Unauthenticated, errors.InvalidPassword)
+	CompetitionPasswordError    = NewRpcError(codes.Unauthenticated, errors.CompetitionPasswordError)
+	CompetitionQuestionNotFound = NewRpcError(codes.NotFound, errors.CompetitionQuestionNotFound)
+	EmailAlreadyRegister        = NewRpcError(codes.AlreadyExists, errors.EmailAlreadyRegister)
+	UserNameAlreadyRegister     = NewRpcError(codes.AlreadyExists, errors.UserNameAlreadyRegister)
+	CompetitionAlreadyAttend    = NewRpcError(codes.AlreadyExists, errors.CompetitionAlreadyAttend)
+	ServerError                 = NewRpcError(codes.Internal, errors.ServerError)
+	DBError                     = NewRpcError(codes.Internal, errors.DBError)
+	GenerateJWTError            = NewRpcError(codes.Internal, errors.GenerateJWTError)
 )

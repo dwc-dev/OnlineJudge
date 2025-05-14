@@ -1,0 +1,23 @@
+Name: microservice.user
+ListenOn: 0.0.0.0:6001
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: microservice.user
+Mysql:
+  DataSource: "user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+JWT:
+  SecretKey: "1234567890"
+Minio:
+  Endpoint: ""
+  UseSSL: true
+  AccessKey: ""
+  SecretKey: ""
+  Bucket: "online-judge"
+  Avatar:
+    Prefix: "avatar"
+    Default: "default.jpg"
+MyRedis:
+  Host: ""
+  Password: ""
+  DB: 0

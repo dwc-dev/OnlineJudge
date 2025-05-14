@@ -1,30 +1,38 @@
 package strategies
 
 import (
+	"backend/code-sandbox/internal/docker"
 	"backend/code-sandbox/internal/strategies/c"
 	"backend/code-sandbox/internal/strategies/cpp"
 	"backend/code-sandbox/internal/strategies/golang"
 	"backend/code-sandbox/internal/strategies/java"
 	"backend/code-sandbox/internal/strategies/python"
 	"backend/code-sandbox/internal/strategies/rust"
-	"backend/code-sandbox/internal/types"
+	"backend/code-sandbox/types"
+	"context"
 	"errors"
 )
 
-func GetStrategy(language string, code string, inputList []string) (types.LanguageStrategy, error) {
-	switch language {
+type LanguageStrategy interface {
+	Prepare(context.Context) error
+	Compile(context.Context) (*types.Result, error)
+	Execute(context.Context) (*types.Result, error)
+}
+
+func GetStrategy(config *types.RunConfig, dockerClient *docker.DockerClient) (LanguageStrategy, error) {
+	switch config.Language {
 	case "c":
-		return c.NewCStrategy(code, inputList), nil
+		return c.NewCStrategy(config, dockerClient), nil
 	case "cpp":
-		return cpp.NewCppStrategy(code, inputList), nil
-	case "rust":
-		return rust.NewRustStrategy(code, inputList), nil
-	case "python":
-		return python.NewPythonStrategy(code, inputList), nil
+		return cpp.NewCppStrategy(config, dockerClient), nil
 	case "java":
-		return java.NewJavaStrategy(code, inputList), nil
+		return java.NewJavaStrategy(config, dockerClient), nil
+	case "python":
+		return python.NewPythonStrategy(config, dockerClient), nil
 	case "golang":
-		return golang.NewGolangStrategy(code, inputList), nil
+		return golang.NewGolangStrategy(config, dockerClient), nil
+	case "rust":
+		return rust.NewRustStrategy(config, dockerClient), nil
 	}
-	return nil, errors.New("不支持的语言")
+	return nil, errors.New("unsupported language")
 }

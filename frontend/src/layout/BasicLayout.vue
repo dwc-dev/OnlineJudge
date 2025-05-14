@@ -1,13 +1,16 @@
 <template>
-  <el-container class="flex h-screen flex-col">
-    <el-header class="!p-0">
+  <el-container class="h-full">
+    <el-header class="!box-content !border-b-1 !border-b-gray-200 !p-0">
       <GlobalHeader />
     </el-header>
-    <el-main class="flex-1 !p-0">
+    <el-main class="!p-0">
       <RouterView />
     </el-main>
-    <el-footer v-if="!isCodingPage" class="flex !h-10 items-center justify-center bg-gray-100">
-      <span class="text-base text-gray-500">OnlineJudge Version 1.0.0</span>
+    <el-footer
+      v-if="!isCodingPage && !isCompetitionQuestionPage"
+      class="flex !h-10 items-center justify-center bg-gray-100"
+    >
+      <span class="text-base text-gray-500">OnlineJudge</span>
     </el-footer>
   </el-container>
 </template>
@@ -19,4 +22,5 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const isCodingPage = computed(() => route.name === 'questionDetail')
+const isCompetitionQuestionPage = computed(() => route.name === 'competitionQuestion')
 </script>

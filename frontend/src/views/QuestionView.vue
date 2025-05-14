@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <div class="px-8 py-4">
     <!-- 搜索区域 -->
     <div class="mb-6 flex gap-4">
       <el-input
@@ -10,7 +10,7 @@
         @clear="handleSearch"
       >
         <template #prefix>
-          <el-icon><search /></el-icon>
+          <el-icon><Search /></el-icon>
         </template>
       </el-input>
 
@@ -22,21 +22,22 @@
         @clear="handleSearch"
       >
         <template #prefix>
-          <el-icon><search /></el-icon>
+          <el-icon><Search /></el-icon>
         </template>
       </el-input>
 
-      <el-input
+      <el-select
         v-model="searchDifficulty"
         placeholder="题目难度"
         clearable
         class="w-48"
         @clear="handleSearch"
+        @change="handleSearch"
       >
-        <template #prefix>
-          <el-icon><search /></el-icon>
-        </template>
-      </el-input>
+        <el-option label="简单" value="easy" />
+        <el-option label="中等" value="medium" />
+        <el-option label="困难" value="hard" />
+      </el-select>
 
       <el-button type="primary" @click="handleSearch">搜索</el-button>
     </div>
@@ -44,7 +45,13 @@
     <!-- 题目列表 -->
     <el-table :data="questions" table-layout="fixed" style="width: 100%" stripe class="mb-4">
       <el-table-column prop="id" label="ID" />
-      <el-table-column prop="title" label="标题" />
+      <el-table-column prop="title" label="标题">
+        <template #default="scope">
+          <el-link @click="handleClickQuestion(scope.row.id)" :underline="false">{{
+            scope.row.title
+          }}</el-link>
+        </template>
+      </el-table-column>
       <el-table-column label="标签">
         <template #default="scope">
           <div class="flex flex-wrap gap-1">
@@ -63,21 +70,19 @@
       </el-table-column>
       <el-table-column label="通过率">
         <template #default="scope">
-          {{ scope.row.AcRate }}
+          {{ scope.row.accepted_num / scope.row.submit_num }}
         </template>
       </el-table-column>
       <el-table-column label="难度">
         <template #default="scope">
-          <el-tag :type="DifficultyToType(scope.row.Difficulty)" effect="light">
-            {{ getDifficulty(scope.row.Difficulty) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作">
-        <template #default="scope">
-          <el-button type="primary" plain @click="handleClickQuestion(scope.row.id)"
-            >答题</el-button
+          <el-tag
+            :type="DifficultyToType(scope.row.difficulty)"
+            effect="light"
+            class="cursor-pointer"
+            @click="quickFilterByDifficulty(scope.row.difficulty)"
           >
+            {{ getDifficulty(scope.row.difficulty) }}
+          </el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -87,10 +92,7 @@
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 30, 50]"
-        layout="total, sizes, prev, pager, next, jumper"
         :total="total"
-        @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
     </div>
@@ -146,7 +148,7 @@ const getQuestions = async () => {
       tag: searchTag.value,
       difficulty: searchDifficulty.value,
     }
-    const response = await question.pagination(currentPage.value, pageSize.value, filter)
+    const response = await question.getPublicQuestionList(currentPage.value, pageSize.value, filter)
     const data = response.data
     questions.value = data.questions
     total.value = data.total
@@ -167,16 +169,15 @@ const quickFilterByTag = (tag: string) => {
   handleSearch()
 }
 
+// 快速按难度筛选
+const quickFilterByDifficulty = (difficulty: string) => {
+  searchDifficulty.value = difficulty
+  handleSearch()
+}
+
 // 页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page
-  getQuestions()
-}
-
-// 每页数量变化
-const handleSizeChange = (size: number) => {
-  pageSize.value = size
-  currentPage.value = 1
   getQuestions()
 }
 

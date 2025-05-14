@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package user;
+option go_package = "./user";
+
+// 用户信息
+message UserInfo {
+  uint64 user_id = 1;
+  string user_name = 2;
+  string user_email = 3;
+  string user_avatar_url = 4;
+  string user_profile = 5;
+  string user_role = 6;
+  uint64 summit_num = 7;
+  uint64 accepted_num = 8;
+  uint64 qutsion_try_num = 9;
+  string create_at = 10;
+  string update_at = 11;
+}
+
+// 注册
+message RegisterReq {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+message RegisterResp {}
+
+// 登录
+message LoginReq {
+  string email = 1;
+  string password = 2;
+}
+message LoginResp {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// AccessToken JTI 校验
+message AccessTokenJTICheckReq {
+  uint64 user_id = 1;
+  string jti = 2;
+}
+message AccessTokenJTICheckResp { bool valid = 1; }
+
+// 刷新token
+message RefreshTokenReq { string refresh_token = 1; }
+message RefreshTokenResp {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// 登出
+message LogoutReq { uint64 user_id = 1; }
+message LogoutResp {}
+
+// 添加用户
+message AddUserReq {
+  UserInfo user_info = 1;
+  string password = 2;
+}
+message AddUserResp {}
+
+// 删除用户
+message DeleteUserReq { uint64 user_id = 1; }
+message DeleteUserResp {}
+
+// 更新用户信息
+message UpdateUserReq {
+  UserInfo user_info = 1;
+  string password = 2;
+  string avatar_base64 = 3;
+}
+message UpdateUserResp {}
+
+// 获取单个用户信息
+message GetUserInfoReq {
+  uint64 user_id = 1;
+  map<string, string> filter = 2;
+  repeated string col = 3;
+}
+message GetUserInfoResp { UserInfo user_info = 1; }
+
+// 获取用户列表
+message GetUserListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  map<string, string> filter = 3;
+}
+message GetUserListResp {
+  repeated UserInfo user_info = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 page_size = 4;
+}
+
+// 用户服务
+service User {
+  rpc Register(RegisterReq) returns (RegisterResp);
+
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc RefreshToken(RefreshTokenReq) returns (RefreshTokenResp);
+  rpc AccessTokenJTICheck(AccessTokenJTICheckReq)
+      returns (AccessTokenJTICheckResp);
+  rpc Logout(LogoutReq) returns (LogoutResp);
+
+  rpc AddUser(AddUserReq) returns (AddUserResp);
+  rpc DeleteUser(DeleteUserReq) returns (DeleteUserResp);
+  rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+  rpc GetUserList(GetUserListReq) returns (GetUserListResp);
+}

@@ -3,19 +3,30 @@ package codes
 import "net/http"
 
 const (
-	InvalidParams   = uint32(40001)
-	UserNoFound     = uint32(40002)
-	InvalidPassword = uint32(40003)
+	InvalidParams               = uint32(40001)
+	UserNoFound                 = uint32(40002)
+	InvalidPassword             = uint32(40003)
+	CompetitionQuestionNotFound = uint32(40004)
 )
 
 const (
-	JWTInvalid = uint32(40101)
-	JWTExpired = uint32(40102)
+	AccessTokenInvalid       = uint32(40101)
+	RefreshTokenInvalid      = uint32(40102)
+	CompetitionPasswordError = uint32(40103)
+	AdminAuthFailed          = uint32(40104)
 )
 
 const (
-	EmailAlreadyRegister    = uint32(40901)
-	UserNameAlreadyRegister = uint32(40902)
+	CompetitionNotRunning  = uint32(40301)
+	CompetitionNotStarted  = uint32(40302)
+	CompetitionNotAttend   = uint32(40303)
+	BlockDuringCompetition = uint32(40304)
+)
+
+const (
+	EmailAlreadyRegister     = uint32(40901)
+	UserNameAlreadyRegister  = uint32(40902)
+	CompetitionAlreadyAttend = uint32(40903)
 )
 
 const (
@@ -26,15 +37,24 @@ const (
 )
 
 var CodeToHTTPStatus = map[uint32]int{
-	InvalidParams:   http.StatusBadRequest,
-	UserNoFound:     http.StatusBadRequest,
-	InvalidPassword: http.StatusBadRequest,
+	InvalidParams:               http.StatusBadRequest,
+	UserNoFound:                 http.StatusBadRequest,
+	InvalidPassword:             http.StatusBadRequest,
+	CompetitionQuestionNotFound: http.StatusBadRequest,
 
-	JWTInvalid: http.StatusUnauthorized,
-	JWTExpired: http.StatusUnauthorized,
+	AccessTokenInvalid:       http.StatusUnauthorized,
+	RefreshTokenInvalid:      http.StatusUnauthorized,
+	CompetitionPasswordError: http.StatusUnauthorized,
+	AdminAuthFailed:          http.StatusUnauthorized,
 
-	EmailAlreadyRegister:    http.StatusConflict,
-	UserNameAlreadyRegister: http.StatusConflict,
+	BlockDuringCompetition: http.StatusForbidden,
+	CompetitionNotAttend:   http.StatusForbidden,
+	CompetitionNotStarted:  http.StatusForbidden,
+	CompetitionNotRunning:  http.StatusForbidden,
+
+	EmailAlreadyRegister:     http.StatusConflict,
+	UserNameAlreadyRegister:  http.StatusConflict,
+	CompetitionAlreadyAttend: http.StatusConflict,
 
 	ServerError:      http.StatusInternalServerError,
 	DBError:          http.StatusInternalServerError,

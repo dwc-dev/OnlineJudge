@@ -1,0 +1,127 @@
+type UserInfo {
+	UserId        uint64 `json:"user_id,optional,omitempty"`
+	UserName      string `json:"user_name,optional,omitempty"`
+	UserEmail     string `json:"user_email,optional,omitempty"`
+	UserAvatarUrl string `json:"user_avatar_url,optional,omitempty"`
+	UserProfile   string `json:"user_profile,optional,omitempty"`
+	UserRole      string `json:"user_role,optional,omitempty"`
+	CreateAt      string `json:"create_at,optional,omitempty"`
+	UpdateAt      string `json:"update_at,optional,omitempty"`
+}
+type (
+	RegisterReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	RegisterResp  {}
+	LoginReq {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	LoginResp {
+		AccessToken string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	LogoutReq {}
+	LogoutResp  {}
+	RefreshTokenReq {
+		RefreshToken string `json:"refresh_token"`
+	}
+	RefreshTokenResp {
+		AccessToken string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	// 添加用户
+	AddUserReq {
+		UserInfo
+		Password string `json:"user_password"`
+	}
+	AddUserResp  {}
+	// 删除用户
+	DeleteUserReq {
+		UserId uint64 `json:"user_id"`
+	}
+	DeleteUserResp  {}
+	// 更新用户
+	UpdateUserReq {
+		UserInfo
+		Password string `json:"user_password,optional"`
+		AvatarBase64 string `json:"avatar_base64,optional"`
+	}
+	UpdateUserResp  {}
+	// 获取用户信息
+	GetUserInfoReq  {}
+	GetUserInfoResp {
+		UserInfo
+	}
+	// 获取公共信息
+	GetPublicInfoReq {
+		UserId uint64 `json:"user_id"`
+	}
+	GetPublicInfoResp {
+		UserInfo
+	}
+	// 获取用户列表
+	GetUserListReq {
+		Page     int64             `json:"page"`
+		PageSize int64             `json:"page_size"`
+		Filter   map[string]string `json:"filter"`
+	}
+	GetUserListResp {
+		UserInfo []*UserInfo `json:"users"`
+		Total    int64       `json:"total"`
+		Page     int64       `json:"page"`
+		PageSize int64       `json:"page_size"`
+	}
+)
+
+@server (
+	prefix: api/v1
+	group:  user
+)
+service gateway-api {
+	@handler register
+	post /user/register (RegisterReq) returns (RegisterResp)
+
+	@handler login
+	post /user/login (LoginReq) returns (LoginResp)
+
+	@handler getPublicInfo
+	post /user/public_info (GetPublicInfoReq) returns (GetPublicInfoResp)
+
+	@handler refreshToken
+	post /user/refresh_token (RefreshTokenReq) returns (RefreshTokenResp)
+}
+
+@server (
+	prefix:     api/v1
+	group:      user
+	middleware: AccessTokenAuth
+)
+service gateway-api {
+	@handler getUserInfo
+	post /user/info (GetUserInfoReq) returns (GetUserInfoResp)
+
+	@handler logout
+	post /user/logout (LogoutReq) returns (LogoutResp)
+}
+
+@server (
+	prefix:     api/v1/admin
+	group:      user
+	middleware: AccessTokenAuth,AdminAuth
+)
+service gateway-api {
+	@handler addUser
+	post /user/add (AddUserReq) returns (AddUserResp)
+
+	@handler deleteUser
+	post /user/delete (DeleteUserReq) returns (DeleteUserResp)
+
+	@handler updateUser
+	post /user/update (UpdateUserReq) returns (UpdateUserResp)
+
+	@handler getUserList
+	post /user/list (GetUserListReq) returns (GetUserListResp)
+}

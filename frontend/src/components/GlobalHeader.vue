@@ -1,10 +1,10 @@
 <template>
-  <div class="flex max-h-fit items-center border-b-1 border-b-gray-200">
+  <div class="flex items-center">
     <RouterLink to="/" class="mr-5 ml-5 text-xl font-bold text-gray-800">OnlineJudge</RouterLink>
-    <el-menu mode="horizontal" :default-active="activeIndex" class="flex-1 gap-5" :router="true">
-      <el-menu-item index="/">主页</el-menu-item>
-      <el-menu-item index="/question">题库</el-menu-item>
-      <el-menu-item index="/contest">比赛</el-menu-item>
+    <el-menu mode="horizontal" :default-active="activeIndex" class="flex-1 gap-2" :router="true">
+      <el-menu-item v-for="item in menuItems" :key="item.path" :index="item.path">{{
+        item.name
+      }}</el-menu-item>
     </el-menu>
     <div v-if="!isLogin">
       <el-button plain class="mr-5" @click="handleLogin">登录/注册</el-button>
@@ -31,54 +31,44 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import jwt from '@/api/http/jwt'
+import { menuConfig } from '@/config/menuConfig'
+import token from '@/api/http/token'
 import api from '@/api'
-
+import { ElMessage } from 'element-plus'
 const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
-const activeIndex = ref(route.path)
 const isLogin = computed(() => userStore.isLogin)
-
-onMounted(() => {
-  if (jwt.getToken()) {
-    api.user
-      .getUserInfo()
-      .then((res) => {
-        userStore.setUserInfo({
-          uid: res.data.user_id,
-          username: res.data.user_name,
-          avatar: res.data.user_avatar_url,
-          email: res.data.user_email,
-          role: res.data.user_role,
-          profile: res.data.user_profile,
-        })
-      })
-      .catch((err) => {
-        ElMessage.error(err.message)
-      })
+const activeIndex = computed(() => {
+  if (route.path.includes('/manage')) {
+    return '/manage'
   }
+  return route.path
 })
 
-// 监听路由变化，更新激活菜单项
-watch(
-  () => route.path,
-  (newPath) => {
-    activeIndex.value = newPath
-  },
-)
+const menuItems = computed(() => {
+  return menuConfig.filter((item) => {
+    if (item.requiresAuth) {
+      return item.roles.includes(userStore.role)
+    }
+    return true
+  })
+})
 
 const handleLogin = () => {
   router.push('/auth/login')
 }
 
-const handleLogout = () => {
-  jwt.clearToken()
+const handleLogout = async () => {
+  await api.user.logout()
+  token.clearAccessToken()
+  token.clearRefreshToken()
   userStore.logout()
   router.push('/')
+  ElMessage.success('退出成功')
 }
 
 const handleSpace = () => {

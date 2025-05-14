@@ -1,0 +1,100 @@
+type JudgeCase {
+	Input  string `json:"input,optional"`
+	Output string `json:"output,optional"`
+}
+type JudgeConfig {
+	MemoryLimitMib     int64 `json:"memory_limit_mib,optional"`
+	StackLimitMib      int64 `json:"stack_limit_mib,optional"`
+	TimeoutMillisecond int64 `json:"timeout_millisecond,optional"`
+}
+type QuestionInfo {
+	Id           uint64       `json:"id,optional,omitempty"`
+	Title        string       `json:"title,optional,omitempty"`
+	Content      string       `json:"content,optional,omitempty"`
+	Tags         []string     `json:"tags,optional,omitempty"`
+	Difficulty   string       `json:"difficulty,optional,omitempty"`
+	SubmitNum    uint64       `json:"submit_num,optional"`
+	AcceptedNum  uint64       `json:"accepted_num,optional"`
+	JudgeCase    []*JudgeCase `json:"judge_case,optional,omitempty"`
+	JudgeConfig  *JudgeConfig `json:"judge_config,optional,omitempty"`
+	VisibleScope string       `json:"visible_scope,optional,omitempty"`
+	CreateAt     string       `json:"create_at,optional,omitempty"`
+	UpdateAt     string       `json:"update_at,optional,omitempty"`
+}
+type (
+	// 添加题目
+	AddQuestionReq {
+		QuestionInfo
+	}
+	AddQuestionResp {}
+	// 删除题目
+	DeleteQuestionReq {
+		Id uint64 `json:"id"`
+	}
+	DeleteQuestionResp {}
+	// 更新题目
+	UpdateQuestionReq {
+		QuestionInfo
+	}
+	UpdateQuestionResp {}
+	// 获取题目信息（单个题目）
+	GetQuestionBasicInfoReq {
+		Id uint64 `json:"id"`
+	}
+	GetQuestionBasicInfoResp {
+		QuestionInfo
+	}
+	// 获取题目列表（分页）
+	GetQuestionListReq {
+		Page     int64             `json:"page"`
+		PageSize int64             `json:"page_size"`
+		Filter   map[string]string `json:"filter"`
+	}
+	GetQuestionListResp {
+		QuestionInfo []*QuestionInfo `json:"questions"`
+		Total        int64           `json:"total"`
+		Page         int64           `json:"page"`
+		PageSize     int64           `json:"page_size"`
+	}
+	// 获取公共题目列表（分页）
+	GetPublicQuestionListReq {
+		Page     int64             `json:"page"`
+		PageSize int64             `json:"page_size"`
+		Filter   map[string]string `json:"filter"`
+	}
+	GetPublicQuestionListResp {
+		QuestionInfo []*QuestionInfo `json:"questions"`
+		Total        int64           `json:"total"`
+		Page         int64           `json:"page"`
+		PageSize     int64           `json:"page_size"`
+	}
+)
+@server (
+	prefix: api/v1
+	group:  question
+)
+service gateway-api {
+	@handler getQuestionBasicInfo
+	post /question/basic_info (GetQuestionBasicInfoReq) returns (GetQuestionBasicInfoResp)
+
+	@handler getPublicQuestionList
+	post /question/public_list (GetPublicQuestionListReq) returns (GetPublicQuestionListResp)
+}
+@server (
+	prefix: api/v1/admin
+	group:  question
+	middleware: AccessTokenAuth,AdminAuth
+)
+service gateway-api {
+	@handler addQuestion
+	post /question/add (AddQuestionReq) returns (AddQuestionResp)
+
+	@handler deleteQuestion
+	post /question/delete (DeleteQuestionReq) returns (DeleteQuestionResp)
+
+	@handler updateQuestion
+	post /question/update (UpdateQuestionReq) returns (UpdateQuestionResp)
+
+	@handler getQuestionList
+	post /question/list (GetQuestionListReq) returns (GetQuestionListResp)
+}

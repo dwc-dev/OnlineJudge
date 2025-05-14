@@ -1,0 +1,196 @@
+syntax = "v1"
+
+// 基础类型
+type CompetitionInfo {
+	Id                uint64 `json:"id,optional,omitempty"`
+	Name              string `json:"name,optional,omitempty"`
+	Description       string `json:"description,optional,omitempty"`
+	StartTime         string `json:"start_time,optional,omitempty"`
+	EndTime           string `json:"end_time,optional,omitempty"`
+	Questions         []*CompetitionQuestion `json:"questions,optional,omitempty"`
+	CompetitionType   string `json:"competition_type,optional,omitempty"`
+	PasswordRequired  bool   `json:"password_required,optional"`
+}
+type CompetitionQuestion {
+	Qid string `json:"qid"`
+	Id uint64 `json:"id"`
+}
+type QuestionBasicInfo {
+	Qid   string `json:"qid"`
+	Title string `json:"title"`
+}
+type JudgeConfigComp {
+	MemoryLimitMib     int64 `json:"memory_limit_mib,optional"`
+	StackLimitMib      int64 `json:"stack_limit_mib,optional"`
+	TimeoutMillisecond int64 `json:"timeout_millisecond,optional"`
+}
+type QuestionDetailInfo {
+	Qid     string `json:"qid"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	JudgeConfig JudgeConfigComp `json:"judge_config"`
+}
+type JudgeResult {
+	ExecDetails        []*ExecDetail `json:"exec_details"`         // 每个测试用例的执行结果
+	CompileError       bool          `json:"compile_error"`        // 是否编译错误
+	CompileErrorOutput string        `json:"compile_error_output"` // 错误输出
+}
+type ScoreDetail{
+	Qid string `json:"qid"`
+	Score float64 `json:"score"`
+}
+type CompetitionScore{
+	UserId uint64 `json:"user_id"`
+	Username string `json:"username"`
+	TotalScore float64 `json:"total_score"`
+	ScoreDetails []ScoreDetail `json:"score_details"`
+}
+
+
+// 用户接口
+type GetCompetitionInfoReq {
+	CompetitionId uint64 `json:"competition_id"`
+}
+type GetCompetitionInfoResp {
+	CompetitionInfo `json:"competition_info"`
+}
+type GetCompetitionListReq {
+	Page     int64 `json:"page"`
+	PageSize int64 `json:"page_size"`
+	Filter   map[string]string `json:"filter"`
+}
+type GetCompetitionListResp {
+	CompetitionList []*CompetitionInfo `json:"competition_list"`
+	Total           int64             `json:"total"`
+	Page            int64             `json:"page"`
+	PageSize        int64             `json:"page_size"`
+}
+type GetCompetitionQuestionListReq {
+	CompetitionId uint64 `json:"competition_id"`
+}
+type GetCompetitionQuestionListResp {
+	QuestionList []QuestionBasicInfo `json:"question_list"`
+}
+type GetCompetitionQuestionDetailReq {
+	CompetitionId uint64 `json:"competition_id"`
+	Qid string `json:"qid"`
+}
+type GetCompetitionQuestionDetailResp {
+	QuestionDetailInfo `json:"question_detail_info"`
+}
+type GetCompetitionRankListReq{
+	CompetitionId uint64 `json:"competition_id"`
+}
+type GetCompetitionRankListResp{
+	RankList []*CompetitionScore `json:"rank_list"`
+}
+type AttendCompetitionReq{
+	CompetitionId uint64 `json:"competition_id"`
+	Password string `json:"password"`
+}
+type AttendCompetitionResp{}
+type SubmitCompetitionQuestionReq{
+	CompetitionId uint64 `json:"competition_id"`
+	Qid string `json:"qid"`
+	Code string `json:"code"`
+	Language string `json:"language"`
+}
+type SubmitCompetitionQuestionResp{
+	JudgeResult `json:"judge_result"`
+}
+@server (
+	prefix:     api/v1
+	group:      competition
+)
+service gateway-api {
+	@handler getCompetitionList
+	post /competition/list (GetCompetitionListReq) returns (GetCompetitionListResp)
+}
+@server (
+	prefix:     api/v1
+	group:      competition
+	middleware: AccessTokenAuth
+)
+service gateway-api {
+	@handler attendCompetition
+	post /competition/attend (AttendCompetitionReq) returns (AttendCompetitionResp)
+}
+@server (
+	prefix:     api/v1
+	group:      competition
+	middleware: AccessTokenAuth,CheckContestAccess,RequireContestPermission
+)
+service gateway-api {
+	@handler getCompetitionInfo
+	post /competition/info (GetCompetitionInfoReq) returns (GetCompetitionInfoResp)
+}
+@server (
+	prefix:     api/v1
+	group:      competition
+	middleware: AccessTokenAuth,CheckContestAccess,RequireContestPermission,RequireContestStarted
+)
+service gateway-api {
+	@handler getCompetitionQuestionList
+	post /competition/question/list (GetCompetitionQuestionListReq) returns (GetCompetitionQuestionListResp)
+
+	@handler getCompetitionRankList
+	post /competition/rank/list (GetCompetitionRankListReq) returns (GetCompetitionRankListResp)
+
+	@handler getCompetitionQuestionDetail
+	post /competition/question/detail (GetCompetitionQuestionDetailReq) returns (GetCompetitionQuestionDetailResp)
+}
+@server (
+	prefix:     api/v1
+	group:      competition
+	middleware: AccessTokenAuth,CheckContestAccess,RequireContestPermission,RequireContestRunning
+)
+service gateway-api {
+	@handler submitCompetitionQuestion
+	post /competition/question/submit (SubmitCompetitionQuestionReq) returns (SubmitCompetitionQuestionResp)
+}
+
+
+// 管理员接口
+type AdminGetCompetitionListReq {
+	Page     int64 `json:"page"`
+	PageSize int64 `json:"page_size"`
+	Filter   map[string]string `json:"filter"`
+}
+type AdminGetCompetitionListResp {
+	CompetitionList []*CompetitionInfo `json:"competition_list"`
+	Total           int64             `json:"total"`
+	Page            int64             `json:"page"`
+	PageSize        int64             `json:"page_size"`
+}
+type AddCompetitionReq {
+	CompetitionInfo `json:"competition_info"`
+	password        string `json:"password"`
+}
+type AddCompetitionResp {}
+type DeleteCompetitionReq {
+	Id uint64 `json:"id"`
+}
+type DeleteCompetitionResp {}
+type UpdateCompetitionReq {
+	CompetitionInfo `json:"competition_info"`
+	password        string `json:"password"`
+}
+type UpdateCompetitionResp {}
+@server (
+	prefix:     api/v1/admin
+	group:      competition
+	middleware: AccessTokenAuth,AdminAuth
+)
+service gateway-api {
+	@handler adminGetCompetitionList
+	post /competition/list (AdminGetCompetitionListReq) returns (AdminGetCompetitionListResp)
+
+	@handler addCompetition
+	post /competition/add (AddCompetitionReq) returns (AddCompetitionResp)
+
+	@handler deleteCompetition
+	post /competition/delete (DeleteCompetitionReq) returns (DeleteCompetitionResp)
+
+	@handler updateCompetition
+	post /competition/update (UpdateCompetitionReq) returns (UpdateCompetitionResp)
+}

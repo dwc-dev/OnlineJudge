@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package competition;
+option go_package = "./competition";
+
+message CompetitionInfo {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3;
+  string start_time = 4;
+  string end_time = 5;
+  string questions = 6;
+  string type = 7;
+  bool is_public = 8;
+  string password = 9;
+  bool password_required = 10;
+  uint64 password_version = 11;
+  string jwt_secret_key = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+message QuestionBasicInfo {
+  string qid = 1;
+  string title = 2;
+}
+message QuestionDetailInfo {
+  string qid = 1;
+  string title = 2;
+  string content = 3;
+  string judge_config = 4;
+}
+message ExecDetail {
+  string output = 1;
+  int64 time_milliseconds = 2;
+  int64 memory_usage = 3;
+  bool timeout = 4;
+  bool memory_out = 5;
+  bool runtime_error = 6;
+  bool stack_overflow = 7;
+  bool accepted = 8;
+}
+message JudgeResult {
+  repeated ExecDetail exec_details = 1;
+  bool compile_error = 2;
+  string compile_error_output = 3;
+}
+message ScoreDetail {
+  string qid = 1;
+  double score = 2;
+}
+message CompetitionScore {
+  uint64 user_id = 1;
+  string username = 2;
+  double total_score = 3;
+  repeated ScoreDetail score_details = 4;
+}
+message CompetitionAttendance {
+  uint64 id = 1;
+  uint64 competition_id = 2;
+  uint64 user_id = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message GetCompetitionInfoReq {
+  uint64 id = 1;
+  bool admin = 2;
+}
+message GetCompetitionInfoResp { CompetitionInfo competition = 1; }
+
+message GetCompetitionListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  map<string, string> filter = 3;
+  repeated string col = 4;
+}
+message GetCompetitionListResp {
+  repeated CompetitionInfo competition_list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 page_size = 4;
+}
+
+message GetCompetitionQuestionListReq { uint64 competition_id = 1; }
+message GetCompetitionQuestionListResp {
+  repeated QuestionBasicInfo question_list = 1;
+}
+
+message GetCompetitionQuestionDetailReq {
+  uint64 competition_id = 1;
+  string qid = 2;
+}
+message GetCompetitionQuestionDetailResp { QuestionDetailInfo question = 1; }
+
+message GetCompetitionRankListReq { uint64 competition_id = 1; }
+message GetCompetitionRankListResp { repeated CompetitionScore rank_list = 1; }
+
+message AddCompetitionReq { CompetitionInfo competition = 1; }
+message AddCompetitionResp {}
+
+message UpdateCompetitionReq { CompetitionInfo competition = 1; }
+message UpdateCompetitionResp {}
+
+message DeleteCompetitionReq { uint64 id = 1; }
+message DeleteCompetitionResp {}
+
+message AttendCompetitionReq {
+  uint64 user_id = 1;
+  uint64 competition_id = 2;
+  string password = 3;
+}
+message AttendCompetitionResp {}
+
+message SubmitCompetitionQuestionReq {
+  uint64 user_id = 1;
+  uint64 competition_id = 2;
+  string qid = 3;
+  string code = 4;
+  string language = 5;
+}
+message SubmitCompetitionQuestionResp { JudgeResult judge_result = 1; }
+
+message ContestAccessCheckReq {
+  uint64 user_id = 1;
+  uint64 competition_id = 2;
+}
+message ContestAccessCheckResp {
+  bool has_permission = 1;
+  bool has_started = 2;
+  bool is_running = 3;
+}
+message IsUserInCompetitionReq { uint64 user_id = 1; }
+message IsUserInCompetitionResp { bool is_in_competition = 1; }
+
+service Competition {
+  rpc GetCompetitionList(GetCompetitionListReq)
+      returns (GetCompetitionListResp);
+  rpc GetCompetitionInfo(GetCompetitionInfoReq)
+      returns (GetCompetitionInfoResp);
+  rpc AddCompetition(AddCompetitionReq) returns (AddCompetitionResp);
+  rpc UpdateCompetition(UpdateCompetitionReq) returns (UpdateCompetitionResp);
+  rpc DeleteCompetition(DeleteCompetitionReq) returns (DeleteCompetitionResp);
+  rpc AttendCompetition(AttendCompetitionReq) returns (AttendCompetitionResp);
+  rpc GetCompetitionQuestionList(GetCompetitionQuestionListReq)
+      returns (GetCompetitionQuestionListResp);
+  rpc GetCompetitionQuestionDetail(GetCompetitionQuestionDetailReq)
+      returns (GetCompetitionQuestionDetailResp);
+  rpc SubmitCompetitionQuestion(SubmitCompetitionQuestionReq)
+      returns (SubmitCompetitionQuestionResp);
+  rpc ContestAccessCheck(ContestAccessCheckReq)
+      returns (ContestAccessCheckResp);
+  rpc GetCompetitionRankList(GetCompetitionRankListReq)
+      returns (GetCompetitionRankListResp);
+  rpc IsUserInCompetition(IsUserInCompetitionReq)
+      returns (IsUserInCompetitionResp);
+}

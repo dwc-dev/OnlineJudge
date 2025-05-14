@@ -1,0 +1,57 @@
+type Message {
+	Role string `json:"role"`
+	Content string `json:"content"`
+}
+
+type Session {
+	SessionId string `json:"session_id"`
+	QuestionId uint64 `json:"question_id"`
+	Title string `json:"title"`
+}
+
+type ChatReq {
+	QuestionId uint64 `json:"question_id"`
+	SessionId string `json:"session_id"`
+	Message string `json:"message"`
+}
+type ChatResp {
+}
+
+type GetQuestionSessionsReq {
+	QuestionId uint64 `json:"question_id"`
+}
+type GetQuestionSessionsResp {
+}
+
+type GetSessionMessageHistoryReq {
+	SessionId string `json:"session_id"`
+}
+type GetSessionMessageHistoryResp {
+}
+
+type CodeCheckReq {
+	QuestionId uint64 `json:"question_id"`
+	Code string `json:"code"`
+}
+type CodeCheckResp {
+}
+
+@server (
+	prefix: api/v1
+	group:  ai
+	middleware: AccessTokenAuth,BlockDuringCompetition
+	timeout:    600s
+)
+service gateway-api {
+	@handler chat
+	post /ai/chat (ChatReq) returns (ChatResp)
+
+	@handler codeCheck
+	post /ai/code/check (CodeCheckReq) returns (CodeCheckResp)
+
+	@handler getQuestionSessions
+	post /ai/question/sessions (GetQuestionSessionsReq) returns (GetQuestionSessionsResp)
+
+	@handler getSessionMessageHistory
+	post /ai/session/chat/history (GetSessionMessageHistoryReq) returns (GetSessionMessageHistoryResp)
+}

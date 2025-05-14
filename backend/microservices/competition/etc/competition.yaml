@@ -1,0 +1,28 @@
+Name: microservice.competition
+ListenOn: 0.0.0.0:6004
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: microservice.competition
+Timeout: 60000
+UserRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.user
+  NonBlock: true
+QuestionRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.question
+  NonBlock: true
+JudgeRpc:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: microservice.judge
+  NonBlock: true
+  Timeout: 60000
+Mysql:
+  DataSource: "user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
