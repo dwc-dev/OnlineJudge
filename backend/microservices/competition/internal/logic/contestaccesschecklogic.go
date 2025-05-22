@@ -45,10 +45,10 @@ func (l *ContestAccessCheckLogic) ContestAccessCheck(in *competition.ContestAcce
 	hasStarted := false
 	isRunning := false
 	now := time.Now()
-	if now.After(*comp.StartTime) {
+	if now.After(comp.StartTime) {
 		hasStarted = true
 	}
-	if now.After(*comp.StartTime) && now.Before(*comp.EndTime) {
+	if now.After(comp.StartTime) && now.Before(comp.EndTime) {
 		isRunning = true
 	}
 	return &competition.ContestAccessCheckResp{

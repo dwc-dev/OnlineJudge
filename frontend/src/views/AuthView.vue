@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-center space-y-6 px-4 py-12">
+  <div class="flex flex-col items-center justify-center space-y-6 px-4 py-12" v-loading="loading">
     <h2
       class="bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-3xl leading-relaxed font-extrabold text-transparent"
     >
@@ -47,9 +47,26 @@
             />
           </el-form-item>
           <el-form-item>
+            <el-tooltip placement="right" effect="light">
+              <template #content>
+                <p>密码格式要求：</p>
+                <p>1. 密码长度为8-30位</p>
+                <p>2. 密码只能包含数字、大小写字母和特殊字符~!@#$%^&*()_+</p>
+                <p>3. 新密码不能和旧密码相同</p>
+              </template>
+              <el-input
+                v-model="registerForm.password"
+                placeholder="请输入密码"
+                type="password"
+                show-password
+                :prefix-icon="Lock"
+              />
+            </el-tooltip>
+          </el-form-item>
+          <el-form-item>
             <el-input
-              v-model="registerForm.password"
-              placeholder="请输入密码"
+              v-model="registerForm.confirmPassword"
+              placeholder="请再次输入密码"
               type="password"
               show-password
               :prefix-icon="Lock"
@@ -73,7 +90,7 @@ const route = useRoute()
 const router = useRouter()
 const activeTab = ref(route.params.type || 'login')
 const userStore = useUserStore()
-
+const loading = ref(false)
 const handleTabChange = (tabName: string) => {
   router.push(`/auth/${tabName}`)
 }
@@ -98,9 +115,11 @@ const registerForm = ref({
   username: '',
   email: '',
   password: '',
+  confirmPassword: '',
 })
 
 const handleLogin = async () => {
+  loading.value = true
   api.user
     .login(loginForm.value.email, loginForm.value.password)
     .then(() => {
@@ -125,15 +144,49 @@ const handleLogin = async () => {
     .catch((err) => {
       ElMessage.error(err.message)
     })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 const handleRegister = async () => {
-  await api.user.register(
-    registerForm.value.username,
-    registerForm.value.email,
-    registerForm.value.password,
-  )
-  ElMessage.success('注册成功！')
+  loading.value = true
+  if (
+    registerForm.value.password === '' ||
+    registerForm.value.confirmPassword === '' ||
+    registerForm.value.username === '' ||
+    registerForm.value.email === ''
+  ) {
+    ElMessage.error('请填写完整信息')
+    loading.value = false
+    return
+  }
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    ElMessage.error('两次输入的密码不一致')
+    loading.value = false
+    return
+  }
+  try {
+    await api.user.register(
+      registerForm.value.username,
+      registerForm.value.email,
+      registerForm.value.password,
+    )
+    activeTab.value = 'login'
+    loginForm.value.email = registerForm.value.email
+    loginForm.value.password = registerForm.value.password
+    registerForm.value.username = ''
+    registerForm.value.email = ''
+    registerForm.value.password = ''
+    registerForm.value.confirmPassword = ''
+    loading.value = false
+    ElMessage.success('注册成功！')
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      ElMessage.error(error.message)
+    }
+    loading.value = false
+  }
 }
 </script>
 

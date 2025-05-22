@@ -30,6 +30,7 @@ class ChatClient:
         )
         return response.choices[0].message.content
 
+    # 流式输出
     def chat(self, messages: list):
         response = self.client.chat.completions.create(
             model=self.model,
@@ -38,6 +39,7 @@ class ChatClient:
         )
         return response
 
+    # 生成对话标题
     def generate_chat_title(self, first_user_message: str) -> str:
         prompt = f"""你是一个智能助手，善于提炼对话主题。
         请根据用户的第一句消息，生成一个简洁、准确的对话标题，适合用作对话列表中的名称。

@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 
 	"backend/microservices/judge/internal/svc"
 	"backend/microservices/judge/pb/judge"
@@ -27,7 +26,6 @@ func NewGetJudgeListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetJ
 func (l *GetJudgeListLogic) GetJudgeList(in *judge.GetJudgeListReq) (*judge.GetJudgeListResp, error) {
 	judgeList, total, err := l.svcCtx.JudgeDao.GetJudgeListPage(l.ctx, in.UserId, in.Page, in.PageSize, in.JudgeType)
 	if err != nil {
-		fmt.Println("GetJudgeListPage error: ", err)
 		return nil, err
 	}
 	var judgeListResp []*judge.JudgeInfo
@@ -40,8 +38,8 @@ func (l *GetJudgeListLogic) GetJudgeList(in *judge.GetJudgeListReq) (*judge.GetJ
 			Code:       judgeItem.Code,
 			ExecResult: judgeItem.ExecResult,
 			Accepted:   judgeItem.Accepted,
-			CreateAt:   judgeItem.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdateAt:   judgeItem.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreateAt:   judgeItem.CreateAt.Format("2006-01-02 15:04:05"),
+			UpdateAt:   judgeItem.UpdateAt.Format("2006-01-02 15:04:05"),
 		})
 	}
 	return &judge.GetJudgeListResp{

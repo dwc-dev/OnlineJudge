@@ -45,6 +45,7 @@ func (d *QuestionDao) GetQuestionInfo(id uint64, filter map[string]string, col [
 }
 
 func (d *QuestionDao) GetQuestionList(page, pageSize int64, filter map[string]string, col []string) ([]*model.Question, int64, error) {
+	// 搜索和筛选统一封装在一个字段（filter map）中传递，根据 key 判断是模糊查询还是精确筛选。
 	var questions []*model.Question
 	query := d.db.Model(&model.Question{})
 
@@ -94,4 +95,14 @@ func (d *QuestionDao) GetQuestionJudgeConfig(id uint64) (*model.Question, error)
 		return nil, err
 	}
 	return &question, nil
+}
+
+// 添加提交数量
+func (d *QuestionDao) AddSubmitNum(id uint64) error {
+	return d.db.Model(&model.Question{}).Where("id = ?", id).Update("submit_num", gorm.Expr("submit_num + 1")).Error
+}
+
+// 添加通过数量
+func (d *QuestionDao) AddAcceptedNum(id uint64) error {
+	return d.db.Model(&model.Question{}).Where("id = ?", id).Update("accepted_num", gorm.Expr("accepted_num + 1")).Error
 }

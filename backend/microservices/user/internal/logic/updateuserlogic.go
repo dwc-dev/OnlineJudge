@@ -61,19 +61,19 @@ func (l *UpdateUserLogic) UpdateUser(in *user.UpdateUserReq) (*user.UpdateUserRe
 	}
 
 	newInfo := &model.User{
-		ID:            in.UserInfo.UserId,
-		UserName:      in.UserInfo.UserName,
-		UserEmail:     in.UserInfo.UserEmail,
-		UserProfile:   &in.UserInfo.UserProfile,
-		UserRole:      in.UserInfo.UserRole,
-		UserAvatarURL: avatar_url,
+		ID:        in.UserInfo.UserId,
+		Name:      in.UserInfo.UserName,
+		Email:     in.UserInfo.UserEmail,
+		Profile:   in.UserInfo.UserProfile,
+		Role:      in.UserInfo.UserRole,
+		AvatarURL: avatar_url,
 	}
 	if in.Password != "" {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return nil, rpcerrors.ServerError
 		}
-		newInfo.UserPassword = string(hashedPassword)
+		newInfo.Password = string(hashedPassword)
 	}
 	err = l.svcCtx.UserDao.UpdateUser(l.ctx, newInfo)
 	if err != nil {

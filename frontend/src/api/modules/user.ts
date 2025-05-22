@@ -36,4 +36,12 @@ export const user = {
   logout() {
     return post('/user/logout', undefined, { needToken: true })
   },
+
+  updatePersonalInfo(personalInfo: Record<string, unknown>) {
+    return post('/user/update_personal_info', personalInfo, { needToken: true })
+  },
+
+  updatePassword(oldPassword: string, newPassword: string) {
+    return post('/user/update_password', { old_password: oldPassword, new_password: newPassword }, { needToken: true })
+  },
 }

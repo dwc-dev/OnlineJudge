@@ -114,10 +114,15 @@ import { onMounted, ref, computed, onUnmounted } from 'vue'
 import api from '@/api'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+interface ScoreDetail {
+  qid: string
+  score: number
+}
 interface RankInfo {
   user_id: string
   username: string
   total_score: number
+  score_details: ScoreDetail[]
 }
 const userStore = useUserStore()
 const now = ref(new Date())
@@ -241,8 +246,9 @@ const rankTableData = computed(() => {
     return row
   })
 })
-const rowClassName = (row: unknown) => {
-  if (row.row.user_id === userStore.uid) {
+const rowClassName = ({ row }: { row: { user_id: number } }) => {
+  // console.log(row)
+  if (row.user_id === userStore.uid) {
     return 'my-row'
   }
   return ''

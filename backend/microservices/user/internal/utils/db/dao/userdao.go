@@ -5,6 +5,7 @@ import (
 	"backend/microservices/user/internal/utils/db/model"
 	"context"
 	"errors"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func NewUserDao(db *gorm.DB) *UserDao {
 func (d *UserDao) CheckUserName(ctx context.Context, userName string) error {
 	var count int64
 	err := d.db.WithContext(ctx).Model(&model.User{}).
-		Where("user_name = ?", userName).
+		Where("name = ?", userName).
 		Count(&count).Error
 	if err != nil {
 		return rpcerrors.DBError
@@ -35,7 +36,7 @@ func (d *UserDao) CheckUserName(ctx context.Context, userName string) error {
 func (d *UserDao) CheckUserEmail(ctx context.Context, userEmail string) error {
 	var count int64
 	err := d.db.WithContext(ctx).Model(&model.User{}).
-		Where("user_email = ?", userEmail).
+		Where("email = ?", userEmail).
 		Count(&count).Error
 	if err != nil {
 		return rpcerrors.DBError
@@ -49,6 +50,7 @@ func (d *UserDao) CheckUserEmail(ctx context.Context, userEmail string) error {
 func (d *UserDao) CreateNewUser(ctx context.Context, data *model.User) error {
 	err := d.db.WithContext(ctx).Create(data).Error
 	if err != nil {
+		fmt.Println(err)
 		return rpcerrors.DBError
 	}
 	return nil
@@ -57,8 +59,8 @@ func (d *UserDao) CreateNewUser(ctx context.Context, data *model.User) error {
 func (d *UserDao) CompareUserPassword(ctx context.Context, userEmail string, password string) (userID uint64, userRole string, err error) {
 	var user model.User
 	err = d.db.WithContext(ctx).
-		Select("id", "user_password", "user_role").
-		Where("user_email = ?", userEmail).
+		Select("id", "password", "role").
+		Where("email = ?", userEmail).
 		First(&user).Error
 
 	if err != nil {
@@ -70,11 +72,11 @@ func (d *UserDao) CompareUserPassword(ctx context.Context, userEmail string, pas
 
 	// 第一个参数必须是哈希密码（从数据库中读取的）
 	// 第二个参数必须是用户输入的明文密码
-	err = bcrypt.CompareHashAndPassword([]byte(user.UserPassword), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return 0, "", rpcerrors.InvalidPassword
 	}
-	return user.ID, user.UserRole, nil
+	return user.ID, user.Role, nil
 }
 
 // 增
@@ -118,7 +120,7 @@ func (d *UserDao) GetUserInfoById(ctx context.Context, userId uint64, col []stri
 	return &user, nil
 }
 
-func (d *UserDao) GetUserList(ctx context.Context, page int64, pageSize int64, filter map[string]string) ([]*model.User, error) {
+func (d *UserDao) GetUserList(ctx context.Context, page int64, pageSize int64, filter map[string]string) ([]*model.User, int64, error) {
 	db := d.db.WithContext(ctx).Model(&model.User{})
 
 	// 处理 filter
@@ -126,48 +128,76 @@ func (d *UserDao) GetUserList(ctx context.Context, page int64, pageSize int64, f
 		db = db.Where("id = ?", userID)
 	}
 	if userName, ok := filter["user_name"]; ok && userName != "" {
-		db = db.Where("user_name LIKE ?", "%"+userName+"%")
+		db = db.Where("name LIKE ?", "%"+userName+"%")
 	}
 	if userEmail, ok := filter["user_email"]; ok && userEmail != "" {
-		db = db.Where("user_email LIKE ?", "%"+userEmail+"%")
+		db = db.Where("email LIKE ?", "%"+userEmail+"%")
 	}
 	if userRole, ok := filter["user_role"]; ok && userRole != "" {
-		db = db.Where("user_role = ?", userRole)
+		db = db.Where("role = ?", userRole)
+	}
+
+	var total int64
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
 
 	var users []*model.User
+
 	err := db.
-		Select("id", "user_name", "user_email", "user_avatar_url", "user_profile", "user_role", "create_at", "update_at").
+		Select("id", "name", "email", "avatar_url", "profile", "role", "create_at", "update_at").
 		Offset(int((page - 1) * pageSize)).
 		Limit(int(pageSize)).
-		Order("user_role = 'admin' DESC, id ASC").
+		Order("role = 'admin' DESC, id ASC").
 		Find(&users).Error
 	if err != nil {
-		return nil, rpcerrors.DBError
+		return nil, 0, rpcerrors.DBError
 	}
-	return users, nil
+	return users, total, nil
 }
 
 func (d *UserDao) GetUserNameById(ctx context.Context, userId uint64) (string, error) {
 	var user model.User
 	err := d.db.WithContext(ctx).
-		Select("user_name").
+		Select("name").
 		Where("id = ?", userId).
 		First(&user).Error
 	if err != nil {
 		return "", rpcerrors.DBError
 	}
-	return user.UserName, nil
+	return user.Name, nil
 }
 
 func (d *UserDao) GetUserEmailById(ctx context.Context, userId uint64) (string, error) {
 	var user model.User
 	err := d.db.WithContext(ctx).
-		Select("user_email").
+		Select("email").
 		Where("id = ?", userId).
 		First(&user).Error
 	if err != nil {
 		return "", rpcerrors.DBError
 	}
-	return user.UserEmail, nil
+	return user.Email, nil
+}
+
+// 更新用户密码
+func (d *UserDao) UpdateUserPassword(ctx context.Context, userId uint64, password string) error {
+	err := d.db.WithContext(ctx).Model(&model.User{}).Where("id = ?", userId).Update("password", password).Error
+	if err != nil {
+		return rpcerrors.DBError
+	}
+	return nil
+}
+
+// 获取用户密码
+func (d *UserDao) GetUserPasswordById(ctx context.Context, userId uint64) (string, error) {
+	var user model.User
+	err := d.db.WithContext(ctx).
+		Select("password").
+		Where("id = ?", userId).
+		First(&user).Error
+	if err != nil {
+		return "", rpcerrors.DBError
+	}
+	return user.Password, nil
 }

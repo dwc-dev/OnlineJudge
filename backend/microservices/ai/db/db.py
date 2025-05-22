@@ -1,5 +1,3 @@
-# db/ops.py
-
 import uuid
 from sqlalchemy import (
     Column,
@@ -14,15 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import sessionmaker, scoped_session, Session as SessionType
 from sqlalchemy.ext.declarative import declarative_base
 
-from rpc.rpc import QuestionRpcClient
-
-DB_USER = ""
-DB_PASSWORD = ""
-DB_HOST = ""
-DB_NAME = ""
-DATABASE_URI = (
-    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4"
-)
+from rpc import QuestionRpcClient
 
 Base = declarative_base()
 
@@ -57,24 +47,24 @@ class MessageModel(Base):
     )
 
 
-class DBManager:
-    def __init__(self):
-        self.engine = create_engine(DATABASE_URI, pool_pre_ping=True)
+class DBOperator:
+    def __init__(self, db_uri: str):
+        self.engine = create_engine(db_uri, pool_pre_ping=True)
         self.Session = scoped_session(sessionmaker(bind=self.engine))
         self.question_rpc = QuestionRpcClient()
 
-    def build_system_prompt(self, question_text: str) -> dict:
+    def _build_system_prompt(self, question_text: str) -> dict:
         content = (
             f"你是一个编程竞赛助手，当前的问题是：\n{question_text}\n"
             "请根据用户的问题提供帮助，回答要简洁，专注于算法思路"
         )
         return {"role": "system", "content": content}
 
-    def get_session(self) -> SessionType:
+    def _get_session(self) -> SessionType:
         return self.Session()
 
     def get_or_create_session(self, session_id: str, user_id: int, question_id: int):
-        db = self.get_session()
+        db = self._get_session()
         try:
             if session_id:
                 session_obj = (
@@ -95,7 +85,7 @@ class DBManager:
 
             # 添加系统提示词
             question_info = self.question_rpc.get_question_info(question_id)
-            system_msg = self.build_system_prompt(question_info["content"])
+            system_msg = self._build_system_prompt(question_info["content"])
             msg = MessageModel(
                 session_id=new_session_id,
                 round=0,
@@ -110,7 +100,7 @@ class DBManager:
             db.close()
 
     def build_message_context(self, session_id: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             records = (
                 db.query(MessageModel)
@@ -125,7 +115,7 @@ class DBManager:
             db.close()
 
     def insert_message(self, session_id: str, round_num: int, role: str, content: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             msg = MessageModel(
                 session_id=session_id,
@@ -139,7 +129,7 @@ class DBManager:
             db.close()
 
     def get_next_round(self, session_id: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             last_msg = (
                 db.query(MessageModel)
@@ -152,20 +142,17 @@ class DBManager:
             db.close()
 
     def update_session_title(self, session_id: str, title: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             db.query(SessionModel).filter_by(session_id=session_id).update(
                 {"title": title}
             )
             db.commit()
-        except Exception as e:
-            db.rollback()
-            raise e
         finally:
             db.close()
 
     def get_question_sessions(self, user_id: int, question_id: int):
-        db = self.get_session()
+        db = self._get_session()
         try:
             records = (
                 db.query(SessionModel)
@@ -185,7 +172,7 @@ class DBManager:
             db.close()
 
     def _get_user_id_by_session_id(self, session_id: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             record = db.query(SessionModel).filter_by(session_id=session_id).first()
             return record.user_id
@@ -193,7 +180,7 @@ class DBManager:
             db.close()
 
     def get_session_message_history(self, user_id: int, session_id: str):
-        db = self.get_session()
+        db = self._get_session()
         try:
             user_id_by_session_id = self._get_user_id_by_session_id(session_id)
             if user_id_by_session_id != user_id:
@@ -214,3 +201,15 @@ class DBManager:
             ]
         finally:
             db.close()
+
+
+# db_session推荐的使用方式（模板）
+# db_session = Session()
+# try:
+#     # 执行一些操作
+#     db_session.commit()
+# except Exception:
+#     db_session.rollback()
+#     raise
+# finally:
+#     db_session.close()

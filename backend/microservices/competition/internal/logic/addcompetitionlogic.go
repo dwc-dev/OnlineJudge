@@ -56,8 +56,8 @@ func (l *AddCompetitionLogic) AddCompetition(in *competition.AddCompetitionReq) 
 	err = l.svcCtx.CompetitionDao.CreateCompetition(&models.Competition{
 		Name:            in.Competition.Name,
 		Description:     in.Competition.Description,
-		StartTime:       &startTime,
-		EndTime:         &endTime,
+		StartTime:       startTime,
+		EndTime:         endTime,
 		Questions:       in.Competition.Questions,
 		Type:            in.Competition.Type,
 		Password:        password,

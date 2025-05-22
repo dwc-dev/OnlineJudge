@@ -94,6 +94,14 @@ message GetUserListResp {
   int64 page_size = 4;
 }
 
+// 更新用户密码
+message UpdateUserPasswordReq {
+  uint64 user_id = 1;
+  string old_password = 2;
+  string new_password = 3;
+}
+message UpdateUserPasswordResp {}
+
 // 用户服务
 service User {
   rpc Register(RegisterReq) returns (RegisterResp);
@@ -109,4 +117,6 @@ service User {
   rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
   rpc GetUserList(GetUserListReq) returns (GetUserListResp);
+  rpc UpdateUserPassword(UpdateUserPasswordReq)
+      returns (UpdateUserPasswordResp);
 }

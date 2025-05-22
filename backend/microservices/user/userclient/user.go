@@ -32,6 +32,8 @@ type (
 	RefreshTokenResp        = user.RefreshTokenResp
 	RegisterReq             = user.RegisterReq
 	RegisterResp            = user.RegisterResp
+	UpdateUserPasswordReq   = user.UpdateUserPasswordReq
+	UpdateUserPasswordResp  = user.UpdateUserPasswordResp
 	UpdateUserReq           = user.UpdateUserReq
 	UpdateUserResp          = user.UpdateUserResp
 	UserInfo                = user.UserInfo
@@ -47,6 +49,7 @@ type (
 		UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*UpdateUserResp, error)
 		GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...grpc.CallOption) (*GetUserInfoResp, error)
 		GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListResp, error)
+		UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordReq, opts ...grpc.CallOption) (*UpdateUserPasswordResp, error)
 	}
 
 	defaultUser struct {
@@ -108,4 +111,9 @@ func (m *defaultUser) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts 
 func (m *defaultUser) GetUserList(ctx context.Context, in *GetUserListReq, opts ...grpc.CallOption) (*GetUserListResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUserList(ctx, in, opts...)
+}
+
+func (m *defaultUser) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordReq, opts ...grpc.CallOption) (*UpdateUserPasswordResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UpdateUserPassword(ctx, in, opts...)
 }

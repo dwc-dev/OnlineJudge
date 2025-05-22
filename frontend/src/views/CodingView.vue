@@ -11,7 +11,7 @@
             <span>栈限制: {{ judgeConfig.stack_limit_mib }}MB</span>
           </div>
         </div>
-        <el-scrollbar class="h-full flex-1 pr-2">
+        <el-scrollbar class="w-full flex-1 pr-2">
           <MdPreview :modelValue="questionContent" previewTheme="github" codeTheme="github" />
         </el-scrollbar>
       </div>
@@ -157,7 +157,8 @@ const judgeLanguageMap: Record<string, string> = {
 // 语言默认代码模板
 const defaultCodes: Record<string, string> = {
   C: '#include <stdio.h>\n\nint main() {\n    // 在此编写代码\n    return 0;\n}',
-  'C++': '#include <iostream>\n\nint main() {\n    // 在此编写代码\n    return 0;\n}',
+  'C++':
+    '#include <iostream>\nusing namespace std;\n\nint main() {\n    // 在此编写代码\n    return 0;\n}',
   Java: 'public class Main {\n    public static void main(String[] args) {\n        // 在此编写代码\n    }\n}',
   Python: '# 在此编写代码',
   Go: 'package main\n\nfunc main() {\n    // 在此编写代码\n}',
@@ -229,6 +230,13 @@ watch(aiChatExpanded, () => {
       editor.layout()
     }
   }, 0)
+})
+
+// 添加对窗口大小的监听
+window.addEventListener('resize', () => {
+  if (editor) {
+    editor.layout()
+  }
 })
 
 const initEditor = () => {

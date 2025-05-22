@@ -9,7 +9,7 @@ CREATE TABLE `judges` (
         'python',
         'golang',
         'rust'
-    ) COMMENT '语言',
+    ) NOT NULL COMMENT '语言',
     `code` TEXT NOT NULL COMMENT '代码',
     `exec_result` TEXT NOT NULL COMMENT '执行结果',
     `accepted` BOOLEAN NOT NULL COMMENT '是否通过',

@@ -2,10 +2,9 @@ import axios from 'axios'
 import token from './token'
 import type { InternalRequestConfig, RequestConfig } from './types'
 
-const instance = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8888/api/v1',
-  timeout: 10000,
-})
+export const BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8888/api/v1'
+
+const instance = axios.create({baseURL: BASE_URL})
 
 instance.interceptors.request.use((config: InternalRequestConfig) => {
   if (config.needToken) {

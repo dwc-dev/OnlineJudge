@@ -1,5 +1,5 @@
 ###
-# 该脚本用于运行所有 Go 程序，包括微服务和网关
+# 该脚本用于运行所有 Go 程序，包括微服务和网关（Python实现的微服务需手动启动）
 # 使用方法：python run.py
 # 按 Ctrl+C 退出所有 Go 程序
 # 如果需要编译，请设置 compiler_flag = True

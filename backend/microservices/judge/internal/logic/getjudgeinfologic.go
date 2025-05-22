@@ -37,8 +37,8 @@ func (l *GetJudgeInfoLogic) GetJudgeInfo(in *judge.GetJudgeInfoReq) (*judge.GetJ
 			Code:       judgeInfo.Code,
 			ExecResult: judgeInfo.ExecResult,
 			Accepted:   judgeInfo.Accepted,
-			CreateAt:   judgeInfo.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdateAt:   judgeInfo.UpdatedAt.Format("2006-01-02 15:04:05"),
+			CreateAt:   judgeInfo.CreateAt.Format("2006-01-02 15:04:05"),
+			UpdateAt:   judgeInfo.UpdateAt.Format("2006-01-02 15:04:05"),
 		},
 	}, nil
 }

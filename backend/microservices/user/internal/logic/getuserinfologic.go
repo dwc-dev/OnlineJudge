@@ -28,18 +28,14 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.GetUserInfoReq) (*user.GetUserIn
 	if err != nil {
 		return nil, err
 	}
-	userProfile := ""
-	if u.UserProfile != nil {
-		userProfile = *u.UserProfile
-	}
 	return &user.GetUserInfoResp{
 		UserInfo: &user.UserInfo{
 			UserId:        in.UserId,
-			UserName:      u.UserName,
-			UserEmail:     u.UserEmail,
-			UserAvatarUrl: u.UserAvatarURL,
-			UserProfile:   userProfile,
-			UserRole:      u.UserRole,
+			UserName:      u.Name,
+			UserEmail:     u.Email,
+			UserAvatarUrl: u.AvatarURL,
+			UserProfile:   u.Profile,
+			UserRole:      u.Role,
 			CreateAt:      u.CreateAt.Format("2006-01-02 15:04:05"),
 			UpdateAt:      u.UpdateAt.Format("2006-01-02 15:04:05"),
 		},

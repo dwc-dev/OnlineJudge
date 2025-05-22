@@ -51,6 +51,8 @@
         v-model:page-size="pageSize"
         :total="total"
         class="mt-4"
+        @size-change="search"
+        @current-change="search"
       />
     </el-card>
 
@@ -297,7 +299,7 @@ const handleClickAvatar = () => {
   // 选择文件，并转为base64
   const file = document.createElement('input')
   file.type = 'file'
-  file.accept = 'image/*'
+  file.accept = 'image/jpeg, image/png'
   file.onchange = () => {
     currentUser.value.user_avatar_url = URL.createObjectURL(file.files![0])
     const reader = new FileReader()

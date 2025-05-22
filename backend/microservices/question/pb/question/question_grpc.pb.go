@@ -26,6 +26,8 @@ const (
 	Question_GetQuestionList_FullMethodName        = "/question.Question/GetQuestionList"
 	Question_GetQuestionJudgeCase_FullMethodName   = "/question.Question/GetQuestionJudgeCase"
 	Question_GetQuestionJudgeConfig_FullMethodName = "/question.Question/GetQuestionJudgeConfig"
+	Question_AddSubmitNum_FullMethodName           = "/question.Question/AddSubmitNum"
+	Question_AddAcceptedNum_FullMethodName         = "/question.Question/AddAcceptedNum"
 )
 
 // QuestionClient is the client API for Question service.
@@ -41,6 +43,8 @@ type QuestionClient interface {
 	GetQuestionList(ctx context.Context, in *GetQuestionListReq, opts ...grpc.CallOption) (*GetQuestionListResp, error)
 	GetQuestionJudgeCase(ctx context.Context, in *GetQuestionJudgeCaseReq, opts ...grpc.CallOption) (*GetQuestionJudgeCaseResp, error)
 	GetQuestionJudgeConfig(ctx context.Context, in *GetQuestionJudgeConfigReq, opts ...grpc.CallOption) (*GetQuestionJudgeConfigResp, error)
+	AddSubmitNum(ctx context.Context, in *AddSubmitNumReq, opts ...grpc.CallOption) (*AddSubmitNumResp, error)
+	AddAcceptedNum(ctx context.Context, in *AddAcceptedNumReq, opts ...grpc.CallOption) (*AddAcceptedNumResp, error)
 }
 
 type questionClient struct {
@@ -121,6 +125,26 @@ func (c *questionClient) GetQuestionJudgeConfig(ctx context.Context, in *GetQues
 	return out, nil
 }
 
+func (c *questionClient) AddSubmitNum(ctx context.Context, in *AddSubmitNumReq, opts ...grpc.CallOption) (*AddSubmitNumResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddSubmitNumResp)
+	err := c.cc.Invoke(ctx, Question_AddSubmitNum_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *questionClient) AddAcceptedNum(ctx context.Context, in *AddAcceptedNumReq, opts ...grpc.CallOption) (*AddAcceptedNumResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddAcceptedNumResp)
+	err := c.cc.Invoke(ctx, Question_AddAcceptedNum_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QuestionServer is the server API for Question service.
 // All implementations must embed UnimplementedQuestionServer
 // for forward compatibility.
@@ -134,6 +158,8 @@ type QuestionServer interface {
 	GetQuestionList(context.Context, *GetQuestionListReq) (*GetQuestionListResp, error)
 	GetQuestionJudgeCase(context.Context, *GetQuestionJudgeCaseReq) (*GetQuestionJudgeCaseResp, error)
 	GetQuestionJudgeConfig(context.Context, *GetQuestionJudgeConfigReq) (*GetQuestionJudgeConfigResp, error)
+	AddSubmitNum(context.Context, *AddSubmitNumReq) (*AddSubmitNumResp, error)
+	AddAcceptedNum(context.Context, *AddAcceptedNumReq) (*AddAcceptedNumResp, error)
 	mustEmbedUnimplementedQuestionServer()
 }
 
@@ -164,6 +190,12 @@ func (UnimplementedQuestionServer) GetQuestionJudgeCase(context.Context, *GetQue
 }
 func (UnimplementedQuestionServer) GetQuestionJudgeConfig(context.Context, *GetQuestionJudgeConfigReq) (*GetQuestionJudgeConfigResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetQuestionJudgeConfig not implemented")
+}
+func (UnimplementedQuestionServer) AddSubmitNum(context.Context, *AddSubmitNumReq) (*AddSubmitNumResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddSubmitNum not implemented")
+}
+func (UnimplementedQuestionServer) AddAcceptedNum(context.Context, *AddAcceptedNumReq) (*AddAcceptedNumResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAcceptedNum not implemented")
 }
 func (UnimplementedQuestionServer) mustEmbedUnimplementedQuestionServer() {}
 func (UnimplementedQuestionServer) testEmbeddedByValue()                  {}
@@ -312,6 +344,42 @@ func _Question_GetQuestionJudgeConfig_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Question_AddSubmitNum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddSubmitNumReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuestionServer).AddSubmitNum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Question_AddSubmitNum_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuestionServer).AddSubmitNum(ctx, req.(*AddSubmitNumReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Question_AddAcceptedNum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAcceptedNumReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuestionServer).AddAcceptedNum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Question_AddAcceptedNum_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuestionServer).AddAcceptedNum(ctx, req.(*AddAcceptedNumReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Question_ServiceDesc is the grpc.ServiceDesc for Question service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -346,6 +414,14 @@ var Question_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetQuestionJudgeConfig",
 			Handler:    _Question_GetQuestionJudgeConfig_Handler,
+		},
+		{
+			MethodName: "AddSubmitNum",
+			Handler:    _Question_AddSubmitNum_Handler,
+		},
+		{
+			MethodName: "AddAcceptedNum",
+			Handler:    _Question_AddAcceptedNum_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

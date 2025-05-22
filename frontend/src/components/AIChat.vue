@@ -18,13 +18,7 @@
         <Plus />
       </el-icon>
     </div>
-    <BubbleList
-      :list="list"
-      class="bubble-list flex-1"
-      maxHeight="99999px"
-      ref="bubbleListRef"
-      @complete="onComplete"
-    />
+    <BubbleList :list="list" class="bubble-list flex-1" maxHeight="99999px" ref="bubbleListRef" />
     <Sender
       placeholder="👋🤖 你好，我是AI助手！"
       clearable
@@ -41,16 +35,15 @@
 <script setup lang="ts">
 import { BubbleList, Sender, useXStream } from 'vue-element-plus-x'
 import type { BubbleListItemProps, BubbleListProps } from 'vue-element-plus-x/types/BubbleList'
-import type { TypewriterInstance } from 'vue-element-plus-x/types/Typewriter'
-import { onMounted, computed, ref, watch, nextTick } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRoute } from 'vue-router'
 import { Plus } from '@element-plus/icons-vue'
 import token from '@/api/http/token'
 import api from '@/api'
 
-import hljs from 'highlight.js'
-import 'highlight.js/styles/github.min.css'
+// import 'vue-element-plus-x/styles/prism.min.css'
+// import 'vue-element-plus-x/styles/prism-coy.min.css'
 
 type Session = {
   session_id: string
@@ -92,12 +85,6 @@ onMounted(() => {
         })
       }
       pageLoading.value = false
-      // DOM 渲染完成后再高亮所有代码块
-      nextTick(() => {
-        document.querySelectorAll('.bubble-list pre code').forEach((block) => {
-          hljs.highlightElement(block as HTMLElement)
-        })
-      })
     })
   })
 })
@@ -117,11 +104,6 @@ const handleSessionChange = () => {
       })
     }
     pageLoading.value = false
-    nextTick(() => {
-      document.querySelectorAll('.bubble-list pre code').forEach((block) => {
-        hljs.highlightElement(block as HTMLElement)
-      })
-    })
   })
 }
 
@@ -199,7 +181,7 @@ const handleSubmit = async () => {
   list.value.push(aiMsg.value)
   bubbleListRef.value.scrollToBottom()
   try {
-    let res = await fetch('http://localhost:8888/api/v1/ai/chat', {
+    let res = await fetch(`${api.BASE_URL}/ai/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +196,7 @@ const handleSubmit = async () => {
     })
     if (!res.ok && res.status === 401) {
       await token.refreshToken()
-      res = await fetch('http://localhost:8888/api/v1/ai/chat', {
+      res = await fetch(`${api.BASE_URL}/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +243,6 @@ const handleSubmit = async () => {
       },
       { immediate: false },
     )
-    senderDisabled.value = false
     await startStream({ readableStream })
     stopWatchAiContent()
     stopWatchSessionInfo()
@@ -270,20 +251,13 @@ const handleSubmit = async () => {
     aiMsg.value.content = '❌ 出错了，请稍后重试'
     aiMsg.value.loading = false
     cancel()
+  } finally {
+    senderDisabled.value = false
   }
-  senderDisabled.value = false
 }
 const handleCancel = () => {
   list.value.pop()
   cancel()
-}
-const onComplete = (instance: TypewriterInstance, index: number) => {
-  console.log('@complete', instance, index)
-  nextTick(() => {
-    document.querySelectorAll('.bubble-list pre code').forEach((block) => {
-      hljs.highlightElement(block as HTMLElement)
-    })
-  })
 }
 </script>
 

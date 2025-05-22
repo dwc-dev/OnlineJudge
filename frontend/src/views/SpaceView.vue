@@ -24,6 +24,7 @@
             plain
             v-if="userInfo.user_id == currentUid"
             class="absolute right-0 bottom-0"
+            @click="router.push('/center')"
           >
             编辑信息
           </el-button>
@@ -95,13 +96,14 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import api from '@/api'
 import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const router = useRouter()
 const uid = route.params.id
 const userStore = useUserStore()
 const currentUid = computed(() => userStore.uid)

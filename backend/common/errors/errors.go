@@ -24,6 +24,8 @@ var (
 	InvalidPassword             = NewError(codes.InvalidPassword, "密码错误")
 	CompetitionPasswordError    = NewError(codes.CompetitionPasswordError, "密码错误")
 	CompetitionQuestionNotFound = NewError(codes.CompetitionQuestionNotFound, "题目不存在")
+	OldPasswordError            = NewError(codes.OldPasswordError, "旧密码错误")
+	NewPasswordError            = NewError(codes.NewPasswordError, "新密码格式不符合要求")
 )
 
 var (

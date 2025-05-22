@@ -45,12 +45,12 @@ func (l *AddUserLogic) AddUser(in *user.AddUserReq) (*user.AddUserResp, error) {
 	defaultAvatarUrl := l.svcCtx.MinioClient.GetDefaultAvatarUrl()
 	defaultProfile := "这个人很懒，什么都没有留下"
 	newUser := &model.User{
-		UserName:      in.UserInfo.UserName,
-		UserEmail:     in.UserInfo.UserEmail,
-		UserRole:      in.UserInfo.UserRole,
-		UserPassword:  string(hashedPassword),
-		UserAvatarURL: defaultAvatarUrl,
-		UserProfile:   &defaultProfile,
+		Name:      in.UserInfo.UserName,
+		Email:     in.UserInfo.UserEmail,
+		Role:      in.UserInfo.UserRole,
+		Password:  string(hashedPassword),
+		AvatarURL: defaultAvatarUrl,
+		Profile:   defaultProfile,
 	}
 	err = l.svcCtx.UserDao.AddUser(l.ctx, newUser)
 	if err != nil {

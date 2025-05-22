@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"backend/microservices/competition/internal/svc"
@@ -56,11 +55,7 @@ func (l *UpdateCompetitionLogic) UpdateCompetition(in *competition.UpdateCompeti
 		passwordString := string(hashedPasswordBytes)
 		password = &passwordString
 		passwordVersion++
-		fmt.Println("passwordVersion", passwordVersion)
 	}
-	// if in.Competition.Password == "" && in.Competition.PasswordRequired {
-	// 	return nil, errors.New("password is required")
-	// }
 	if !in.Competition.PasswordRequired {
 		password = nil
 	}
@@ -68,8 +63,8 @@ func (l *UpdateCompetitionLogic) UpdateCompetition(in *competition.UpdateCompeti
 		ID:              in.Competition.Id,
 		Name:            in.Competition.Name,
 		Description:     in.Competition.Description,
-		StartTime:       &startTime,
-		EndTime:         &endTime,
+		StartTime:       startTime,
+		EndTime:         endTime,
 		Questions:       in.Competition.Questions,
 		Type:            in.Competition.Type,
 		Password:        password,

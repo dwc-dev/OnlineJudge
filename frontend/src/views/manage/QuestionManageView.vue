@@ -46,7 +46,7 @@
         <el-button type="primary" @click="search">搜索</el-button>
       </div>
 
-      <el-table :data="tableData" stripe border class="w-full" :loading="loading">
+      <el-table :data="tableData" stripe border class="w-full" v-loading="loading">
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="title" label="标题" />
         <el-table-column prop="tags" label="标签">
@@ -67,7 +67,7 @@
         </el-table-column>
         <el-table-column label="通过率">
           <template #default="scope">
-            {{ scope.row.accepted_num / scope.row.submit_num }}
+            {{ calculatePassRate(scope.row.accepted_num, scope.row.submit_num) }}
           </template>
         </el-table-column>
         <el-table-column prop="difficulty" label="难度">
@@ -526,5 +526,13 @@ const handleDeleteQuestion = async (id: number) => {
   await api.question.deleteQuestion(id)
   ElMessage.success('删除成功')
   search()
+}
+
+// 计算通过率（保留两位小数）
+const calculatePassRate = (acceptedNum: number, submitNum: number) => {
+  if (submitNum === 0) {
+    return '0.00%'
+  }
+  return ((acceptedNum / submitNum) * 100).toFixed(2) + '%'
 }
 </script>

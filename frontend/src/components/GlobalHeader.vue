@@ -76,6 +76,6 @@ const handleSpace = () => {
 }
 
 const handleCenter = () => {
-  router.push(`/center/${userStore.uid}`)
+  router.push('/center')
 }
 </script>

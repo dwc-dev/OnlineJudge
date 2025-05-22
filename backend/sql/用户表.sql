@@ -1,11 +1,11 @@
 CREATE TABLE `users` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `user_name` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户昵称',
-    `user_email` VARCHAR(255) NOT NULL UNIQUE COMMENT '用户邮箱',
-    `user_password` VARCHAR(255) NOT NULL COMMENT '密码',
-    `user_avatar_url` VARCHAR(1024) NOT NULL COMMENT '用户头像URL',
-    `user_profile` TEXT DEFAULT NULL COMMENT '个人简介',
-    `user_role` ENUM('user', 'admin') NOT NULL DEFAULT 'user' COMMENT '用户角色：user/admin',
+    `name` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户昵称',
+    `email` VARCHAR(255) NOT NULL UNIQUE COMMENT '用户邮箱',
+    `password` VARCHAR(255) NOT NULL COMMENT '密码',
+    `avatar_url` VARCHAR(1024) NOT NULL COMMENT '用户头像URL',
+    `profile` TEXT NOT NULL COMMENT '个人简介',
+    `role` ENUM('user', 'admin') NOT NULL DEFAULT 'user' COMMENT '用户角色：user/admin',
     `create_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)

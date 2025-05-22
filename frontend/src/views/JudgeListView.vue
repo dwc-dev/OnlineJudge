@@ -3,7 +3,7 @@
     <h1 class="text-2xl font-bold">评测记录</h1>
 
     <div class="mt-6">
-      <el-table :data="judgeList" stripe border class="w-full">
+      <el-table :data="judgeList" stripe class="w-full">
         <el-table-column prop="judge_id" label="评测ID" width="100" />
         <el-table-column prop="user_id" label="用户ID" width="100" />
         <el-table-column prop="question_id" label="题目ID" width="100" />

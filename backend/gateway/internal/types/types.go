@@ -396,11 +396,27 @@ type UpdateCompetitionReq struct {
 type UpdateCompetitionResp struct {
 }
 
+type UpdatePersonalInfoReq struct {
+	UserInfo
+	AvatarBase64 string `json:"avatar_base64,optional"`
+}
+
+type UpdatePersonalInfoResp struct {
+}
+
 type UpdateQuestionReq struct {
 	QuestionInfo
 }
 
 type UpdateQuestionResp struct {
+}
+
+type UpdateUserPasswordReq struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+type UpdateUserPasswordResp struct {
 }
 
 type UpdateUserReq struct {

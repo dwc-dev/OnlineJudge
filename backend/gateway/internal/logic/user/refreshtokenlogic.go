@@ -4,7 +4,6 @@ import (
 	"backend/gateway/internal/svc"
 	"backend/gateway/internal/types"
 	"context"
-	"fmt"
 
 	"backend/common/errors"
 	"backend/microservices/user/userclient"
@@ -31,18 +30,8 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (resp *type
 		RefreshToken: req.RefreshToken,
 	})
 	if err != nil {
-		fmt.Println("--------------------------------")
-		fmt.Println("refresh token error")
-		fmt.Println("RefreshToken:", req.RefreshToken)
-		fmt.Println("Error:", err)
-		fmt.Println("--------------------------------")
 		return nil, errors.RefreshTokenInvalid
 	}
-	fmt.Println("--------------------------------")
-	fmt.Println("refresh token success")
-	fmt.Println("AccessToken:", rpcResp.AccessToken)
-	fmt.Println("RefreshToken:", rpcResp.RefreshToken)
-	fmt.Println("--------------------------------")
 	return &types.RefreshTokenResp{
 		AccessToken:  rpcResp.AccessToken,
 		RefreshToken: rpcResp.RefreshToken,

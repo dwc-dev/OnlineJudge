@@ -168,6 +168,24 @@ func (l *JudgeLogic) Judge(in *judge.JudgeReq) (*judge.JudgeResp, error) {
 		return nil, err
 	}
 
+	// 添加提交数量
+	_, err = l.svcCtx.QuestionRpc.AddSubmitNum(l.ctx, &question.AddSubmitNumReq{
+		Id: in.QuestionId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if allAccepted {
+		// 添加通过数量
+		_, err = l.svcCtx.QuestionRpc.AddAcceptedNum(l.ctx, &question.AddAcceptedNumReq{
+			Id: in.QuestionId,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	res := &judge.JudgeResp{
 		ExecDetails:        details,
 		CompileError:       result.CompileError,

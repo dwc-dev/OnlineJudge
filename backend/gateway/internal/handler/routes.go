@@ -4,14 +4,15 @@
 package handler
 
 import (
-	ai2 "backend/gateway/internal/handler/ai"
-	competition2 "backend/gateway/internal/handler/competition"
-	judge2 "backend/gateway/internal/handler/judge"
-	question2 "backend/gateway/internal/handler/question"
-	user2 "backend/gateway/internal/handler/user"
-	"backend/gateway/internal/svc"
 	"net/http"
 	"time"
+
+	ai "backend/gateway/internal/handler/ai"
+	competition "backend/gateway/internal/handler/competition"
+	judge "backend/gateway/internal/handler/judge"
+	question "backend/gateway/internal/handler/question"
+	user "backend/gateway/internal/handler/user"
+	"backend/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -24,22 +25,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/ai/chat",
-					Handler: ai2.ChatHandler(serverCtx),
+					Handler: ai.ChatHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/ai/code/check",
-					Handler: ai2.CodeCheckHandler(serverCtx),
+					Handler: ai.CodeCheckHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/ai/question/sessions",
-					Handler: ai2.GetQuestionSessionsHandler(serverCtx),
+					Handler: ai.GetQuestionSessionsHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/ai/session/chat/history",
-					Handler: ai2.GetSessionMessageHistoryHandler(serverCtx),
+					Handler: ai.GetSessionMessageHistoryHandler(serverCtx),
 				},
 			}...,
 		),
@@ -52,7 +53,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/competition/list",
-				Handler: competition2.GetCompetitionListHandler(serverCtx),
+				Handler: competition.GetCompetitionListHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api/v1"),
@@ -65,7 +66,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/attend",
-					Handler: competition2.AttendCompetitionHandler(serverCtx),
+					Handler: competition.AttendCompetitionHandler(serverCtx),
 				},
 			}...,
 		),
@@ -79,7 +80,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/info",
-					Handler: competition2.GetCompetitionInfoHandler(serverCtx),
+					Handler: competition.GetCompetitionInfoHandler(serverCtx),
 				},
 			}...,
 		),
@@ -93,17 +94,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/question/detail",
-					Handler: competition2.GetCompetitionQuestionDetailHandler(serverCtx),
+					Handler: competition.GetCompetitionQuestionDetailHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/question/list",
-					Handler: competition2.GetCompetitionQuestionListHandler(serverCtx),
+					Handler: competition.GetCompetitionQuestionListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/rank/list",
-					Handler: competition2.GetCompetitionRankListHandler(serverCtx),
+					Handler: competition.GetCompetitionRankListHandler(serverCtx),
 				},
 			}...,
 		),
@@ -117,7 +118,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/question/submit",
-					Handler: competition2.SubmitCompetitionQuestionHandler(serverCtx),
+					Handler: competition.SubmitCompetitionQuestionHandler(serverCtx),
 				},
 			}...,
 		),
@@ -131,22 +132,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/add",
-					Handler: competition2.AddCompetitionHandler(serverCtx),
+					Handler: competition.AddCompetitionHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/delete",
-					Handler: competition2.DeleteCompetitionHandler(serverCtx),
+					Handler: competition.DeleteCompetitionHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/list",
-					Handler: competition2.AdminGetCompetitionListHandler(serverCtx),
+					Handler: competition.AdminGetCompetitionListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/competition/update",
-					Handler: competition2.UpdateCompetitionHandler(serverCtx),
+					Handler: competition.UpdateCompetitionHandler(serverCtx),
 				},
 			}...,
 		),
@@ -160,7 +161,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/judge/judgecode",
-					Handler: judge2.JudgeHandler(serverCtx),
+					Handler: judge.JudgeHandler(serverCtx),
 				},
 			}...,
 		),
@@ -175,7 +176,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/judge/list",
-					Handler: judge2.GetJudgeListHandler(serverCtx),
+					Handler: judge.GetJudgeListHandler(serverCtx),
 				},
 			}...,
 		),
@@ -187,12 +188,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/question/basic_info",
-				Handler: question2.GetQuestionBasicInfoHandler(serverCtx),
+				Handler: question.GetQuestionBasicInfoHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/question/public_list",
-				Handler: question2.GetPublicQuestionListHandler(serverCtx),
+				Handler: question.GetPublicQuestionListHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api/v1"),
@@ -205,22 +206,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/question/add",
-					Handler: question2.AddQuestionHandler(serverCtx),
+					Handler: question.AddQuestionHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/question/delete",
-					Handler: question2.DeleteQuestionHandler(serverCtx),
+					Handler: question.DeleteQuestionHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/question/list",
-					Handler: question2.GetQuestionListHandler(serverCtx),
+					Handler: question.GetQuestionListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/question/update",
-					Handler: question2.UpdateQuestionHandler(serverCtx),
+					Handler: question.UpdateQuestionHandler(serverCtx),
 				},
 			}...,
 		),
@@ -232,22 +233,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/login",
-				Handler: user2.LoginHandler(serverCtx),
+				Handler: user.LoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/public_info",
-				Handler: user2.GetPublicInfoHandler(serverCtx),
+				Handler: user.GetPublicInfoHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/refresh_token",
-				Handler: user2.RefreshTokenHandler(serverCtx),
+				Handler: user.RefreshTokenHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/register",
-				Handler: user2.RegisterHandler(serverCtx),
+				Handler: user.RegisterHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api/v1"),
@@ -260,12 +261,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/info",
-					Handler: user2.GetUserInfoHandler(serverCtx),
+					Handler: user.GetUserInfoHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/logout",
-					Handler: user2.LogoutHandler(serverCtx),
+					Handler: user.LogoutHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/update_password",
+					Handler: user.UpdateUserPasswordHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/update_personal_info",
+					Handler: user.UpdatePersonalInfoHandler(serverCtx),
 				},
 			}...,
 		),
@@ -279,22 +290,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/add",
-					Handler: user2.AddUserHandler(serverCtx),
+					Handler: user.AddUserHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/delete",
-					Handler: user2.DeleteUserHandler(serverCtx),
+					Handler: user.DeleteUserHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/list",
-					Handler: user2.GetUserListHandler(serverCtx),
+					Handler: user.GetUserListHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/user/update",
-					Handler: user2.UpdateUserHandler(serverCtx),
+					Handler: user.UpdateUserHandler(serverCtx),
 				},
 			}...,
 		),

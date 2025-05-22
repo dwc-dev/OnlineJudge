@@ -57,3 +57,13 @@ func (s *QuestionServer) GetQuestionJudgeConfig(ctx context.Context, in *questio
 	l := logic.NewGetQuestionJudgeConfigLogic(ctx, s.svcCtx)
 	return l.GetQuestionJudgeConfig(in)
 }
+
+func (s *QuestionServer) AddSubmitNum(ctx context.Context, in *question.AddSubmitNumReq) (*question.AddSubmitNumResp, error) {
+	l := logic.NewAddSubmitNumLogic(ctx, s.svcCtx)
+	return l.AddSubmitNum(in)
+}
+
+func (s *QuestionServer) AddAcceptedNum(ctx context.Context, in *question.AddAcceptedNumReq) (*question.AddAcceptedNumResp, error) {
+	l := logic.NewAddAcceptedNumLogic(ctx, s.svcCtx)
+	return l.AddAcceptedNum(in)
+}

@@ -74,6 +74,19 @@ type (
 		Page     int64       `json:"page"`
 		PageSize int64       `json:"page_size"`
 	}
+	// 更新用户密码
+	UpdateUserPasswordReq {
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+	}
+	UpdateUserPasswordResp {}
+
+	// 更新个人信息
+	UpdatePersonalInfoReq {
+		UserInfo
+		AvatarBase64 string `json:"avatar_base64,optional"`
+	}
+	UpdatePersonalInfoResp {}
 )
 
 @server (
@@ -105,6 +118,12 @@ service gateway-api {
 
 	@handler logout
 	post /user/logout (LogoutReq) returns (LogoutResp)
+
+	@handler updateUserPassword
+	post /user/update_password (UpdateUserPasswordReq) returns (UpdateUserPasswordResp)
+
+	@handler updatePersonalInfo
+	post /user/update_personal_info (UpdatePersonalInfoReq) returns (UpdatePersonalInfoResp)
 }
 
 @server (

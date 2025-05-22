@@ -2,12 +2,14 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"backend/microservices/competition/internal/svc"
 	"backend/microservices/competition/pb/competition"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"gorm.io/gorm"
 )
 
 type IsUserInCompetitionLogic struct {
@@ -31,6 +33,9 @@ func (l *IsUserInCompetitionLogic) IsUserInCompetition(in *competition.IsUserInC
 	}
 	for _, attendance := range attendances {
 		comp, err := l.svcCtx.CompetitionDao.GetCompetitionById(attendance.CompetitionID)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -38,7 +43,7 @@ func (l *IsUserInCompetitionLogic) IsUserInCompetition(in *competition.IsUserInC
 			continue
 		}
 		now := time.Now()
-		if now.After(*comp.StartTime) && now.Before(*comp.EndTime) {
+		if now.After(comp.StartTime) && now.Before(comp.EndTime) {
 			return &competition.IsUserInCompetitionResp{IsInCompetition: true}, nil
 		}
 	}

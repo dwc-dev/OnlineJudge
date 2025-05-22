@@ -7,6 +7,8 @@ const (
 	UserNoFound                 = uint32(40002)
 	InvalidPassword             = uint32(40003)
 	CompetitionQuestionNotFound = uint32(40004)
+	OldPasswordError            = uint32(40005)
+	NewPasswordError            = uint32(40006)
 )
 
 const (
@@ -41,6 +43,8 @@ var CodeToHTTPStatus = map[uint32]int{
 	UserNoFound:                 http.StatusBadRequest,
 	InvalidPassword:             http.StatusBadRequest,
 	CompetitionQuestionNotFound: http.StatusBadRequest,
+	OldPasswordError:            http.StatusBadRequest,
+	NewPasswordError:            http.StatusBadRequest,
 
 	AccessTokenInvalid:       http.StatusUnauthorized,
 	RefreshTokenInvalid:      http.StatusUnauthorized,

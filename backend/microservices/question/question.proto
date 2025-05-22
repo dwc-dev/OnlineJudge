@@ -60,6 +60,14 @@ message GetQuestionJudgeCaseResp { string judge_case = 1; }
 message GetQuestionJudgeConfigReq { uint64 id = 1; }
 message GetQuestionJudgeConfigResp { string judge_config = 1; }
 
+// 添加提交数量
+message AddSubmitNumReq { uint64 id = 1; }
+message AddSubmitNumResp {}
+
+// 添加通过数量
+message AddAcceptedNumReq { uint64 id = 1; }
+message AddAcceptedNumResp {}
+
 // 题目服务
 service Question {
   rpc AddQuestion(AddQuestionReq) returns (AddQuestionResp);
@@ -73,4 +81,7 @@ service Question {
 
   rpc GetQuestionJudgeConfig(GetQuestionJudgeConfigReq)
       returns (GetQuestionJudgeConfigResp);
+
+  rpc AddSubmitNum(AddSubmitNumReq) returns (AddSubmitNumResp);
+  rpc AddAcceptedNum(AddAcceptedNumReq) returns (AddAcceptedNumResp);
 }

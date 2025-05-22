@@ -1,17 +1,27 @@
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import json
-from db.db import DBManager
-from ai.ai import ChatClient
-from rpc.rpc import QuestionRpcClient
+
+from db import DBOperator
+from llm import ChatClient
+from rpc import QuestionRpcClient
 
 # ==================== 配置参数 ====================
-api_key = ""
-base_url = ""
-model = ""
+API_KEY = ""
+BASE_URL = "https://api.deepseek.com"
+MODEL = "deepseek-chat"
 
-db_manager = DBManager()
-chat_client = ChatClient(api_key, base_url, model)
+DB_USER = ""
+DB_PASSWORD = ""
+DB_HOST = ""
+DB_NAME = ""
+DATABASE_URI = (
+    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4"
+)
+
+# ==================== 初始化 ====================
+db_operator = DBOperator(DATABASE_URI)
+chat_client = ChatClient(API_KEY, BASE_URL, MODEL)
 question_rpc = QuestionRpcClient()
 app = Flask(__name__)
 
@@ -46,20 +56,20 @@ def chat():
 
     try:
         # 获取或创建会话（同时插入系统提示）
-        session_id = db_manager.get_or_create_session(
+        session_id = db_operator.get_or_create_session(
             session_id_input, user_id, question_id
         )
         # 获取下一轮轮次
-        current_round = db_manager.get_next_round(session_id)
+        current_round = db_operator.get_next_round(session_id)
         title = ""
         # 如果当前轮次为1，则生成对话标题
         if current_round == 1:
             title = chat_client.generate_chat_title(user_message)
-            db_manager.update_session_title(session_id, title)
+            db_operator.update_session_title(session_id, title)
         # 插入用户消息
-        db_manager.insert_message(session_id, current_round, "user", user_message)
+        db_operator.insert_message(session_id, current_round, "user", user_message)
         # 构建对话上下文
-        messages = db_manager.build_message_context(session_id)
+        messages = db_operator.build_message_context(session_id)
     except Exception as e:
         return jsonify({"code": 500, "msg": f"系统错误: {str(e)}", "data": None})
 
@@ -84,7 +94,7 @@ def chat():
                     )}\n\n"
                     id += 1
             # 将完整回复保存到数据库（轮次递增）
-            db_manager.insert_message(
+            db_operator.insert_message(
                 session_id, current_round + 1, "assistant", ai_reply_full
             )
             yield f"event: message\ndata: {json.dumps(
@@ -120,7 +130,7 @@ def get_question_sessions():
             {
                 "code": 200,
                 "msg": "success",
-                "data": db_manager.get_question_sessions(user_id, question_id),
+                "data": db_operator.get_question_sessions(user_id, question_id),
             }
         )
     except Exception as e:
@@ -140,25 +150,14 @@ def get_session_message_history():
             {
                 "code": 200,
                 "msg": "success",
-                "data": db_manager.get_session_message_history(user_id, session_id),
+                "data": db_operator.get_session_message_history(user_id, session_id),
             }
         )
     except Exception as e:
         return jsonify({"code": 500, "msg": f"系统错误: {str(e)}", "data": None})
 
 
+# ==================== 启动服务 ====================
 if __name__ == "__main__":
     CORS(app)
     app.run(host="127.0.0.1", port=6005)
-
-
-# db_session推荐的使用方式（模板）
-# db_session = Session()
-# try:
-#     # 执行一些操作
-#     db_session.commit()
-# except Exception:
-#     db_session.rollback()
-#     raise
-# finally:
-#     db_session.close()

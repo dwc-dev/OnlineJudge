@@ -24,21 +24,20 @@ func NewGetUserListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUs
 }
 
 func (l *GetUserListLogic) GetUserList(in *user.GetUserListReq) (*user.GetUserListResp, error) {
-	users, err := l.svcCtx.UserDao.GetUserList(l.ctx, in.Page, in.PageSize, in.Filter)
+	users, total, err := l.svcCtx.UserDao.GetUserList(l.ctx, in.Page, in.PageSize, in.Filter)
 	if err != nil {
 		return nil, err
 	}
-	total := int64(len(users))
 
 	userInfos := make([]*user.UserInfo, 0)
 	for _, userItem := range users {
 		userInfos = append(userInfos, &user.UserInfo{
 			UserId:        userItem.ID,
-			UserName:      userItem.UserName,
-			UserEmail:     userItem.UserEmail,
-			UserAvatarUrl: userItem.UserAvatarURL,
-			UserProfile:   *userItem.UserProfile,
-			UserRole:      userItem.UserRole,
+			UserName:      userItem.Name,
+			UserEmail:     userItem.Email,
+			UserAvatarUrl: userItem.AvatarURL,
+			UserProfile:   userItem.Profile,
+			UserRole:      userItem.Role,
 			CreateAt:      userItem.CreateAt.Format("2006-01-02 15:04:05"),
 			UpdateAt:      userItem.UpdateAt.Format("2006-01-02 15:04:05"),
 		})

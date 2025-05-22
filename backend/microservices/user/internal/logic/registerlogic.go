@@ -72,11 +72,11 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterResp, erro
 	defaultAvatarUrl := l.svcCtx.MinioClient.GetDefaultAvatarUrl()
 	defaultProfile := "这个人很懒，什么都没有留下"
 	err = l.svcCtx.UserDao.CreateNewUser(l.ctx, &model.User{
-		UserName:      in.Username,
-		UserEmail:     in.Email,
-		UserPassword:  string(hashedPassword),
-		UserAvatarURL: defaultAvatarUrl,
-		UserProfile:   &defaultProfile,
+		Name:      in.Username,
+		Email:     in.Email,
+		Password:  string(hashedPassword),
+		AvatarURL: defaultAvatarUrl,
+		Profile:   defaultProfile,
 	})
 	if err != nil {
 		return nil, err

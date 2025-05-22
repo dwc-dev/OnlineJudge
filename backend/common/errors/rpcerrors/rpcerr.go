@@ -36,6 +36,8 @@ func FromError(err error) (*pb.RpcError, bool) {
 
 var (
 	InvalidParams               = NewRpcError(codes.InvalidArgument, errors.InvalidParams)
+	OldPasswordError            = NewRpcError(codes.InvalidArgument, errors.OldPasswordError)
+	NewPasswordError            = NewRpcError(codes.InvalidArgument, errors.NewPasswordError)
 	UserNoFound                 = NewRpcError(codes.NotFound, errors.UserNoFound)
 	InvalidPassword             = NewRpcError(codes.Unauthenticated, errors.InvalidPassword)
 	CompetitionPasswordError    = NewRpcError(codes.Unauthenticated, errors.CompetitionPasswordError)

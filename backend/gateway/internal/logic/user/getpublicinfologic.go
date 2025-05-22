@@ -29,10 +29,10 @@ func (l *GetPublicInfoLogic) GetPublicInfo(req *types.GetPublicInfoReq) (resp *t
 		UserId: req.UserId,
 		Col: []string{
 			"id",
-			"user_name",
-			"user_avatar_url",
-			"user_profile",
-			"user_role",
+			"name",
+			"avatar_url",
+			"profile",
+			"role",
 			"create_at",
 		},
 	})

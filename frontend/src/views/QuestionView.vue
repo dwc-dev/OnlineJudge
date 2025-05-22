@@ -70,7 +70,7 @@
       </el-table-column>
       <el-table-column label="通过率">
         <template #default="scope">
-          {{ scope.row.accepted_num / scope.row.submit_num }}
+          {{ calculatePassRate(scope.row.accepted_num, scope.row.submit_num) }}
         </template>
       </el-table-column>
       <el-table-column label="难度">
@@ -192,4 +192,12 @@ onMounted(() => {
   document.title = 'OnlineJudge - 题库'
   getQuestions()
 })
+
+// 计算通过率（保留两位小数）
+const calculatePassRate = (acceptedNum: number, submitNum: number) => {
+  if (submitNum === 0) {
+    return '0.00%'
+  }
+  return ((acceptedNum / submitNum) * 100).toFixed(2) + '%'
+}
 </script>

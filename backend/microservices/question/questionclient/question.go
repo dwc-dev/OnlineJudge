@@ -14,8 +14,12 @@ import (
 )
 
 type (
+	AddAcceptedNumReq          = question.AddAcceptedNumReq
+	AddAcceptedNumResp         = question.AddAcceptedNumResp
 	AddQuestionReq             = question.AddQuestionReq
 	AddQuestionResp            = question.AddQuestionResp
+	AddSubmitNumReq            = question.AddSubmitNumReq
+	AddSubmitNumResp           = question.AddSubmitNumResp
 	DeleteQuestionReq          = question.DeleteQuestionReq
 	DeleteQuestionResp         = question.DeleteQuestionResp
 	GetQuestionInfoReq         = question.GetQuestionInfoReq
@@ -38,6 +42,8 @@ type (
 		GetQuestionList(ctx context.Context, in *GetQuestionListReq, opts ...grpc.CallOption) (*GetQuestionListResp, error)
 		GetQuestionJudgeCase(ctx context.Context, in *GetQuestionJudgeCaseReq, opts ...grpc.CallOption) (*GetQuestionJudgeCaseResp, error)
 		GetQuestionJudgeConfig(ctx context.Context, in *GetQuestionJudgeConfigReq, opts ...grpc.CallOption) (*GetQuestionJudgeConfigResp, error)
+		AddSubmitNum(ctx context.Context, in *AddSubmitNumReq, opts ...grpc.CallOption) (*AddSubmitNumResp, error)
+		AddAcceptedNum(ctx context.Context, in *AddAcceptedNumReq, opts ...grpc.CallOption) (*AddAcceptedNumResp, error)
 	}
 
 	defaultQuestion struct {
@@ -84,4 +90,14 @@ func (m *defaultQuestion) GetQuestionJudgeCase(ctx context.Context, in *GetQuest
 func (m *defaultQuestion) GetQuestionJudgeConfig(ctx context.Context, in *GetQuestionJudgeConfigReq, opts ...grpc.CallOption) (*GetQuestionJudgeConfigResp, error) {
 	client := question.NewQuestionClient(m.cli.Conn())
 	return client.GetQuestionJudgeConfig(ctx, in, opts...)
+}
+
+func (m *defaultQuestion) AddSubmitNum(ctx context.Context, in *AddSubmitNumReq, opts ...grpc.CallOption) (*AddSubmitNumResp, error) {
+	client := question.NewQuestionClient(m.cli.Conn())
+	return client.AddSubmitNum(ctx, in, opts...)
+}
+
+func (m *defaultQuestion) AddAcceptedNum(ctx context.Context, in *AddAcceptedNumReq, opts ...grpc.CallOption) (*AddAcceptedNumResp, error) {
+	client := question.NewQuestionClient(m.cli.Conn())
+	return client.AddAcceptedNum(ctx, in, opts...)
 }

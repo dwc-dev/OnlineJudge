@@ -35,7 +35,7 @@ func (l *GetCompetitionRankListLogic) GetCompetitionRankList(in *competition.Get
 	for _, score := range scores {
 		rpcResp, err := l.svcCtx.UserRpc.GetUserInfo(l.ctx, &userclient.GetUserInfoReq{
 			UserId: score.UserID,
-			Col:    []string{"id", "user_name"},
+			Col:    []string{"id", "name"},
 		})
 		if err != nil {
 			return nil, err
