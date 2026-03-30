@@ -25,6 +25,7 @@ type JWT struct {
 }
 
 type Minio struct {
+	Address   string
 	Endpoint  string
 	UseSSL    bool
 	AccessKey string

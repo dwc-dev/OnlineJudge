@@ -73,9 +73,9 @@ func (c *MinioClient) UploadAvatar(ctx context.Context, userID uint64, avatar_ba
 func (c *MinioClient) GetAvatarUrl(userID uint64) (url string) {
 	objectName := fmt.Sprintf("%s/%d.jpg", c.config.Avatar.Prefix, userID)
 	if c.config.UseSSL {
-		url = fmt.Sprintf("https://%s/%s/%s", c.config.Endpoint, c.config.Bucket, objectName)
+		url = fmt.Sprintf("https://%s/%s/%s", c.config.Address, c.config.Bucket, objectName)
 	} else {
-		url = fmt.Sprintf("http://%s/%s/%s", c.config.Endpoint, c.config.Bucket, objectName)
+		url = fmt.Sprintf("http://%s/%s/%s", c.config.Address, c.config.Bucket, objectName)
 	}
 	return url
 }
@@ -83,9 +83,9 @@ func (c *MinioClient) GetAvatarUrl(userID uint64) (url string) {
 func (c *MinioClient) GetDefaultAvatarUrl() (url string) {
 	objectName := fmt.Sprintf("%s/%s", c.config.Avatar.Prefix, c.config.Avatar.Default)
 	if c.config.UseSSL {
-		url = fmt.Sprintf("https://%s/%s/%s", c.config.Endpoint, c.config.Bucket, objectName)
+		url = fmt.Sprintf("https://%s/%s/%s", c.config.Address, c.config.Bucket, objectName)
 	} else {
-		url = fmt.Sprintf("http://%s/%s/%s", c.config.Endpoint, c.config.Bucket, objectName)
+		url = fmt.Sprintf("http://%s/%s/%s", c.config.Address, c.config.Bucket, objectName)
 	}
 	return url
 }

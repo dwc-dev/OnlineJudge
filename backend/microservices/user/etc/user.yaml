@@ -9,14 +9,13 @@ Mysql:
 JWT:
   SecretKey: "1234567890"
 Minio:
-  Endpoint: ""
-  UseSSL: true
+  Address: ""
+  UseSSL: false
   AccessKey: ""
   SecretKey: ""
-  Bucket: "online-judge"
   Avatar:
     Prefix: "avatar"
-    Default: "default.jpg"
+    Default: "default_avatar.jpg"
 MyRedis:
   Host: ""
   Password: ""

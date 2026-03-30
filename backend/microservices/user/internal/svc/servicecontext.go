@@ -6,6 +6,7 @@ import (
 	"backend/microservices/user/internal/utils/db/model"
 	"backend/microservices/user/internal/utils/mc"
 	"backend/microservices/user/internal/utils/redis"
+	"fmt"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -22,7 +23,7 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 	db, err := gorm.Open(mysql.Open(c.Mysql.DataSource), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect database" + fmt.Sprintf("%s", c.Mysql.DataSource))
 	}
 	// 获取底层连接池对象
 	sqlDB, err := db.DB()

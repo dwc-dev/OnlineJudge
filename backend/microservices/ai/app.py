@@ -1,27 +1,29 @@
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import json
+import os
 
 from db import DBOperator
 from llm import ChatClient
 from rpc import QuestionRpcClient
 
 # ==================== 配置参数 ====================
-API_KEY = ""
-BASE_URL = "https://api.deepseek.com"
-MODEL = "deepseek-chat"
+AI_API_KEY = os.getenv("AI_API_KEY")
+AI_BASE_URL = os.getenv("AI_BASE_URL", "https://api.deepseek.com")
+AI_MODEL = os.getenv("AI_MODEL", "deepseek-chat")
 
-DB_USER = ""
-DB_PASSWORD = ""
-DB_HOST = ""
-DB_NAME = ""
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+
 DATABASE_URI = (
-    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset=utf8mb4"
+    f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DATABASE}?charset=utf8mb4"
 )
 
 # ==================== 初始化 ====================
 db_operator = DBOperator(DATABASE_URI)
-chat_client = ChatClient(API_KEY, BASE_URL, MODEL)
+chat_client = ChatClient(AI_API_KEY, AI_BASE_URL, AI_MODEL)
 question_rpc = QuestionRpcClient()
 app = Flask(__name__)
 
@@ -160,4 +162,4 @@ def get_session_message_history():
 # ==================== 启动服务 ====================
 if __name__ == "__main__":
     CORS(app)
-    app.run(host="127.0.0.1", port=6005)
+    app.run(host="0.0.0.0", port=6005)

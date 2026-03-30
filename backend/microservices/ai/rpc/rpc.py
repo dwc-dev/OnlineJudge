@@ -1,8 +1,8 @@
 import pyetcd
 import grpc
+import os
 from . import question_pb2
 from . import question_pb2_grpc
-
 
 class QuestionRpcClient:
     def __init__(self):
@@ -11,7 +11,9 @@ class QuestionRpcClient:
         self.stub = question_pb2_grpc.QuestionStub(self.channel)
 
     def _get_service_address(self, prefix):
-        etcd = pyetcd.client(host="localhost", port=2379)
+        etcd_host = os.getenv("ETCD_HOST")
+        etcd_port = int(os.getenv("ETCD_PORT"))
+        etcd = pyetcd.client(host=etcd_host, port=etcd_port)
         addresses = []
         for value, _ in etcd.get_prefix(prefix):
             addresses.append(value.decode("utf-8"))

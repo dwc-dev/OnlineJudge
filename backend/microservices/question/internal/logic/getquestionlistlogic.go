@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 
 	"backend/microservices/question/internal/svc"
 	"backend/microservices/question/pb/question"
@@ -26,6 +27,7 @@ func NewGetQuestionListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 func (l *GetQuestionListLogic) GetQuestionList(in *question.GetQuestionListReq) (*question.GetQuestionListResp, error) {
 	questions, total, err := l.svcCtx.QuestionDao.GetQuestionList(in.Page, in.PageSize, in.Filter, in.Col)
 	if err != nil {
+		fmt.Printf("GetQuestionList error: %v\n", err)
 		return nil, err
 	}
 
